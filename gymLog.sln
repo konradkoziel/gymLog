@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34408.163
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gymLog.API", "gymLog\gymLog.API.csproj", "{43EC1D6E-40FA-4192-B9FA-F4E2BFCCEC29}"
-EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "gymlog.gui", "gymLog.GUI\gymlog.gui.esproj", "{E17846F5-CF6C-EAEB-CAE4-804E3319BF2F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gymLog.API", "gymLog.API\gymLog.API.csproj", "{47158D0F-FD24-A536-DCF7-FE115E07B349}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,16 +13,16 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{43EC1D6E-40FA-4192-B9FA-F4E2BFCCEC29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{43EC1D6E-40FA-4192-B9FA-F4E2BFCCEC29}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{43EC1D6E-40FA-4192-B9FA-F4E2BFCCEC29}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{43EC1D6E-40FA-4192-B9FA-F4E2BFCCEC29}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E17846F5-CF6C-EAEB-CAE4-804E3319BF2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E17846F5-CF6C-EAEB-CAE4-804E3319BF2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E17846F5-CF6C-EAEB-CAE4-804E3319BF2F}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{E17846F5-CF6C-EAEB-CAE4-804E3319BF2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E17846F5-CF6C-EAEB-CAE4-804E3319BF2F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E17846F5-CF6C-EAEB-CAE4-804E3319BF2F}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{47158D0F-FD24-A536-DCF7-FE115E07B349}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47158D0F-FD24-A536-DCF7-FE115E07B349}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47158D0F-FD24-A536-DCF7-FE115E07B349}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47158D0F-FD24-A536-DCF7-FE115E07B349}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
