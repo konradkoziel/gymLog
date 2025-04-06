@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace gymLog.API.Migrations
 {
     /// <inheritdoc />
-    public partial class InitializeCreate : Migration
+    public partial class Initialize : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -33,7 +33,7 @@ namespace gymLog.API.Migrations
                 name: "WorkoutPlans",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "varchar(100)", nullable: true),
                     Description = table.Column<string>(type: "varchar(500)", nullable: true),
                     WorkoutSelectedDays = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -53,10 +53,10 @@ namespace gymLog.API.Migrations
                 name: "WorkoutDays",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Day = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "varchar(500)", nullable: true),
-                    WorkoutPlanId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    WorkoutPlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -76,7 +76,7 @@ namespace gymLog.API.Migrations
                     Name = table.Column<string>(type: "varchar(100)", nullable: true),
                     Description = table.Column<string>(type: "varchar(500)", nullable: true),
                     Category = table.Column<string>(type: "varchar(100)", nullable: true),
-                    WorkoutDayId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    WorkoutDayId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {

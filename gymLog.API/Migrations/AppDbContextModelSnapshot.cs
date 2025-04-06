@@ -37,8 +37,8 @@ namespace gymLog.API.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("varchar(100)");
 
-                    b.Property<string>("WorkoutDayId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid?>("WorkoutDayId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -81,8 +81,9 @@ namespace gymLog.API.Migrations
 
             modelBuilder.Entity("gymLog.Model.WorkoutDay", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Day")
                         .HasColumnType("int");
@@ -90,8 +91,8 @@ namespace gymLog.API.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("varchar(500)");
 
-                    b.Property<string>("WorkoutPlanId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid?>("WorkoutPlanId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -102,8 +103,9 @@ namespace gymLog.API.Migrations
 
             modelBuilder.Entity("gymLog.Model.WorkoutPlan", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .HasColumnType("varchar(500)");
