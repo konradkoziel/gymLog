@@ -2,7 +2,7 @@
 {
     public class WorkoutDay
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
         public DayOfWeek Day { get; set; }
         public string Description { get; set; }
 
