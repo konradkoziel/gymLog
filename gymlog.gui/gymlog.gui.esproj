@@ -9,16 +9,24 @@
     <BuildOutputFolder>$(MSBuildProjectDirectory)\dist</BuildOutputFolder>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="public\icons\" />
-    <Folder Include="src\app\protected\" />
-    <Folder Include="src\app\pages\" />
-    <Folder Include="src\components\" />
-    <Folder Include="src\hooks\" />
-    <Folder Include="src\models\" />
-    <Folder Include="src\interfaces\" />
-    <Folder Include="src\routes\" />
-    <Folder Include="src\services\" />
-    <Folder Include="src\stores\" />
+    <None Remove="src\interfaces\.gitkeep\**" />
+    <None Remove="src\models\.gitkeep\**" />
+    <None Remove="src\services\.gitkeep\**" />
+    <None Remove="src\utils\.gitkeep\**" />
+    <TypeScriptConfiguration Remove="src\interfaces\.gitkeep\**" />
+    <TypeScriptConfiguration Remove="src\models\.gitkeep\**" />
+    <TypeScriptConfiguration Remove="src\services\.gitkeep\**" />
+    <TypeScriptConfiguration Remove="src\utils\.gitkeep\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="public\.gitkeep\" />
+    <Folder Include="public\icons\.gitkeep\" />
+    <Folder Include="src\app\pages\.gitkeep\" />
+    <Folder Include="src\app\protected\.gitkeep\" />
+    <Folder Include="src\components\.gitkeep\" />
+    <Folder Include="src\hooks\.gitkeep\" />
+    <Folder Include="src\routes\.gitkeep\" />
+    <Folder Include="src\stores\.gitkeep\" />
     <Folder Include="src\utils\schemas\" />
   </ItemGroup>
 </Project>
