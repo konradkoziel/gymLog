@@ -7,6 +7,8 @@ Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "gymlog.gui", "gymLog.GUI\gy
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gymLog.API", "gymLog.API\gymLog.API.csproj", "{47158D0F-FD24-A536-DCF7-FE115E07B349}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gymLog.Tests", "gymLog.Test\gymLog.Tests.csproj", "{8B515BFC-D18A-4BED-8BBF-BFAAD52B1E23}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{47158D0F-FD24-A536-DCF7-FE115E07B349}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47158D0F-FD24-A536-DCF7-FE115E07B349}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47158D0F-FD24-A536-DCF7-FE115E07B349}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B515BFC-D18A-4BED-8BBF-BFAAD52B1E23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B515BFC-D18A-4BED-8BBF-BFAAD52B1E23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B515BFC-D18A-4BED-8BBF-BFAAD52B1E23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B515BFC-D18A-4BED-8BBF-BFAAD52B1E23}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
