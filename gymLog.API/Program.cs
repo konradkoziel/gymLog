@@ -21,6 +21,8 @@ builder.Services.AddScoped<IExerciseService, ExerciseService>();
 builder.Services.AddScoped<IWorkoutDayService, WorkoutDayService>();
 builder.Services.AddScoped<IWorkoutPlanService, WorkoutPlanService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddSingleton<ILogService, LogService>();
+
 
 // Add JWT authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");

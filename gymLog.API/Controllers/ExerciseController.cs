@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using gymLog.Model;
+﻿using gymLog.Model;
 using gymLog.API.Services.interfaces;
 
 namespace gymLog.API.Controllers
@@ -12,62 +8,115 @@ namespace gymLog.API.Controllers
     public class ExerciseController : ControllerBase
     {
         private readonly IExerciseService _service;
+        private readonly ILogService _logService;
 
-        public ExerciseController(IExerciseService exerciseService)
+        public ExerciseController(IExerciseService exerciseService, ILogService logService)
         {
             _service = exerciseService;
+            _logService = logService;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Exercise>>> GetExercises()
         {
-            var exercises = await _service.GetAllAsync();
-            return Ok(exercises);
+            _logService.LogInfo("Getting all exercises");
+            try
+            {
+                var exercises = await _service.GetAllAsync();
+                _logService.LogInfo("Got {count} exercises", exercises.Count ?? 0);
+                return Ok(exercises);
+            }
+            catch (Exception ex)
+            {
+                _logService.LogError(ex, "Error while getting all exercises");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
+            }
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Exercise>> GetExercise(Guid id)
         {
-            var exercise = await _service.GetByIdAsync(id);
-
-            if (exercise == null)
+            _logService.LogInfo("Getting exercise with ID {id}", id);
+            try
             {
-                return NotFound();
-            }
+                var exercise = await _service.GetByIdAsync(id);
 
-            return Ok(exercise);
+                if (exercise == null)
+                {
+                    _logService.LogWarning("Exercise with ID {id} not found", id);
+                    return NotFound();
+                }
+
+                return Ok(exercise);
+            }
+            catch (Exception ex)
+            {
+                _logService.LogError(ex, "Error while getting exercise with ID {id}", id);
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
+            }
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutExercise(Guid id, Exercise exercise)
         {
-            if (id != exercise.Id)
+            _logService.LogInfo("Updating exercise with ID {id}", id);
+            try
             {
-                return BadRequest();
-            }
+                if (id != exercise.Id)
+                {
+                    _logService.LogWarning("ID in URL ({urlId}) doesn't match exercise.Id ({exerciseId})", id, exercise.Id);
+                    return BadRequest();
+                }
 
-            var updatedExercise = await _service.UpdateAsync(exercise);
-            return Ok(updatedExercise);
+                var updated = await _service.UpdateAsync(exercise);
+                _logService.LogInfo("Exercise with ID {id} updated", id);
+                return Ok(updated);
+            }
+            catch (Exception ex)
+            {
+                _logService.LogError(ex, "Error while updating exercise with ID {id}", id);
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
+            }
         }
 
         [HttpPost]
         public async Task<ActionResult<Exercise>> PostExercise(Exercise exercise)
         {
-            var createdExercise = await _service.CreateAsync(exercise);
-            return CreatedAtAction(nameof(GetExercise), new { id = createdExercise.Id }, createdExercise);
+            _logService.LogInfo("Creating new exercise");
+            try
+            {
+                var created = await _service.CreateAsync(exercise);
+                _logService.LogInfo("Exercise created with ID {id}", created.Id);
+                return CreatedAtAction(nameof(GetExercise), new { id = created.Id }, created);
+            }
+            catch (Exception ex)
+            {
+                _logService.LogError(ex, "Error while creating exercise");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
+            }
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteExercise(Guid id)
         {
-            var result = await _service.DeleteAsync(id);
-            if (!result)
+            _logService.LogInfo("Deleting exercise with ID {id}", id);
+            try
             {
-                return NotFound();
-            }
+                var result = await _service.DeleteAsync(id);
+                if (!result)
+                {
+                    _logService.LogWarning("Exercise with ID {id} not found for deletion", id);
+                    return NotFound();
+                }
 
-            return NoContent();
+                _logService.LogInfo("Exercise with ID {id} deleted", id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logService.LogError(ex, "Error while deleting exercise with ID {id}", id);
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
+            }
         }
     }
 }
-
