@@ -58,6 +58,5 @@ namespace gymLog.Entity
         public DbSet<Exercise> Exercises { get; set; }
         public DbSet<WorkoutPlan> WorkoutPlans { get; set; }
         public DbSet<WorkoutDay> WorkoutDays { get; set; }
-    
     }
 }

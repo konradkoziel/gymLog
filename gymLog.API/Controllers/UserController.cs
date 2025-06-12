@@ -53,8 +53,12 @@ namespace gymLog.API.Controllers
         [HttpPost]
         public async Task<ActionResult<Exercise>> PostExercise(User user)
         {
-            var createdUser = await _service.CreateAsync(user);
-            return CreatedAtAction(nameof(GetExercise), new { id = createdUser.Id }, createdUser);
+            var createdUserResult = await _service.CreateAsync(user);
+            
+            if (createdUserResult.IsSuccess) 
+                return CreatedAtAction(nameof(GetExercise), new { id = createdUserResult.Data!.Id }, createdUserResult.Data);
+            
+            return BadRequest(createdUserResult);
         }
 
         [HttpDelete("{id}")]

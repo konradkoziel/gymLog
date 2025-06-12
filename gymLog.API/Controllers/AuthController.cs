@@ -55,8 +55,12 @@ namespace gymLog.API.Controllers
                 CreatedAt = DateTime.UtcNow
             };
 
-            var createdUser = await _userService.CreateAsync(user);
-            return CreatedAtAction(nameof(Login), new { email = createdUser.Email }, createdUser);
+            var result = await _userService.CreateAsync(user);
+            if (result.IsSuccess) {
+                return CreatedAtAction(nameof(Login), new { email = result.Data!.Email }, result.Data);
+            }
+            
+            return BadRequest(result);
         }
 
         private string GenerateJwtToken(User user)

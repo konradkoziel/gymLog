@@ -1,8 +1,6 @@
-﻿using gymLog.Entity;
+﻿using gymLog.API.Model.DTO;
+using gymLog.Entity;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace gymLog.API.Services
 {
@@ -18,11 +16,11 @@ namespace gymLog.API.Services
         }
 
         // Create a new entity
-        public virtual async Task<T> CreateAsync(T entity)
+        public virtual async Task<Result<T>> CreateAsync(T entity)
         {
             _dbSet.Add(entity);
             await _context.SaveChangesAsync();
-            return entity;
+            return Result<T>.Success(entity, "Data created successfully");
         }
 
         // Get all entities

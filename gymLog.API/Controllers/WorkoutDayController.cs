@@ -54,8 +54,12 @@ namespace gymLog.API.Controllers
         [HttpPost]
         public async Task<ActionResult<WorkoutDay>> PostWorkoutDay(WorkoutDay workoutDay)
         {
-            var createdWorkoutDay = await _workoutDayService.CreateAsync(workoutDay);
-            return CreatedAtAction(nameof(GetWorkoutDay), new { id = createdWorkoutDay.Id }, createdWorkoutDay);
+            var createdWorkoutDayResult = await _workoutDayService.CreateAsync(workoutDay);
+            
+            if (createdWorkoutDayResult.IsSuccess) 
+                return CreatedAtAction(nameof(GetWorkoutDay), new { id = createdWorkoutDayResult.Data!.Id }, createdWorkoutDayResult.Data);
+            
+            return BadRequest(createdWorkoutDayResult);
         }
 
         [HttpDelete("{id}")]
