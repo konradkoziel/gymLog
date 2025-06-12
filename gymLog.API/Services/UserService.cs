@@ -1,7 +1,6 @@
 ﻿using gymLog.API.Services.interfaces;
 using gymLog.Entity;
 using gymLog.Model;
-using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.EntityFrameworkCore;
 
 namespace gymLog.API.Services
