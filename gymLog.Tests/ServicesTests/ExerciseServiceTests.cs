@@ -29,12 +29,7 @@ public class ExerciseServiceTests {
             Category = BodyPartCategories.FullBody,
             Description = "Test description",
             Name = "Full Body Exercise",
-            WorkoutDay = new WorkoutDay {
-                Id = Guid.NewGuid(),
-                Description = "Test description",
-                Exercises = A.Fake<IList<Exercise>>(),
-                Day = DayOfWeek.Monday,
-            }
+            WorkoutDayId = Guid.NewGuid()
         };
         
         // Act
