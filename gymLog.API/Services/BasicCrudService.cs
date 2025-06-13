@@ -24,37 +24,41 @@ namespace gymLog.API.Services
         }
 
         // Get all entities
-        public virtual async Task<IEnumerable<T>> GetAllAsync()
+        public virtual async Task<Result<IEnumerable<T>>> GetAllAsync()
         {
-            return await _dbSet.ToListAsync();
+            List<T> entities = await _dbSet.ToListAsync();
+            return Result<IEnumerable<T>>.Success(entities, "Data collections returned successfully");
         }
 
         // Get entity by ID
-        public virtual async Task<T> GetByIdAsync(Guid id)
+        public virtual async Task<Result<T?>> GetByIdAsync(Guid id)
         {
-            return await _dbSet.FindAsync(id);
+            T entity = await _dbSet.FindAsync(id);
+            if (entity == null)
+                return Result<T?>.Failure("Entity not found", []);
+            return Result<T?>.Success(entity, "Data returned successfully");
         }
 
         // Update an existing entity
-        public virtual async Task<T> UpdateAsync(T entity)
+        public virtual async Task<Result<T?>> UpdateAsync(T entity)
         {
             _dbSet.Update(entity);
             await _context.SaveChangesAsync();
-            return entity;
+            return Result<T?>.Success(entity, "Data updated successfully");
         }
 
         // Delete an entity by ID
-        public virtual async Task<bool> DeleteAsync(Guid id)
+        public virtual async Task<Result<bool>> DeleteAsync(Guid id)
         {
             var entity = await _dbSet.FindAsync(id);
             if (entity == null)
             {
-                return false;
+                return Result<bool>.Failure("Data not found", null);
             }
 
             _dbSet.Remove(entity);
             await _context.SaveChangesAsync();
-            return true;
+            return Result<bool>.Success(true, "Data deleted successfully");
         }
     }
 }

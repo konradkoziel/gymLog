@@ -108,22 +108,84 @@ public class ExerciseServiceTests {
         await _context.SaveChangesAsync();
         
         // Act
-        IEnumerable<Exercise> exercises = await _exerciseService.GetAllAsync();
+        Result<IEnumerable<Exercise>> exercisesResult = await _exerciseService.GetAllAsync();
         
         // Assert
-        Assert.NotNull(exercises);
-        Assert.Equal(10, exercises.Count());
+        Assert.True(exercisesResult.IsSuccess);
+        Assert.NotNull(exercisesResult.Data);
+        Assert.Equal(10, exercisesResult.Data.Count());
     }
     
     [Fact]
     public async Task GetAllExercises_ShouldReturnAllExercises_WhenListIsEmpty() {
         // Act
-        IEnumerable<Exercise> exercises = await _exerciseService.GetAllAsync();
+        Result<IEnumerable<Exercise>> exercisesResult = await _exerciseService.GetAllAsync();
         
         // Assert
-        Assert.NotNull(exercises);
-        Assert.Empty(exercises);
+        Assert.NotNull(exercisesResult.Data);
+        Assert.Empty(exercisesResult.Data);
     }
     
     #endregion
+    
+    [Fact]
+    public async Task GetExerciseById_ShouldReturnExercise_WhenExerciseExists() {
+        // Arrange
+        WorkoutDay workoutDay = new WorkoutDay() {
+            Id = Guid.NewGuid(),
+            Day = DayOfWeek.Friday,
+            Description = "Test",
+            Exercises = []
+        };
+        
+        Exercise exercise = new Exercise {
+            Id = Guid.NewGuid(),
+            Category = BodyPartCategories.FullBody,
+            Description = "Test description",
+            Name = "Full Body Exercise",
+            WorkoutDayId = workoutDay.Id,
+            WorkoutDay = workoutDay
+        };
+        
+        _context.Exercises.Add(exercise);
+        await _context.SaveChangesAsync();
+        
+        // Act
+        Result<Exercise> exerciseResult = await _exerciseService.GetByIdAsync(exercise.Id);
+        
+        // Assert
+        Assert.True(exerciseResult.IsSuccess);
+        Assert.NotNull(exerciseResult.Data);
+        Assert.Equal(exercise.Id, exerciseResult.Data.Id);
+    }
+    
+    [Fact]
+    public async Task GetExerciseById_ShouldReturnExercise_WhenExerciseNotExists() {
+        // Arrange
+        WorkoutDay workoutDay = new WorkoutDay() {
+            Id = Guid.NewGuid(),
+            Day = DayOfWeek.Friday,
+            Description = "Test",
+            Exercises = []
+        };
+        
+        Exercise exercise = new Exercise {
+            Id = Guid.NewGuid(),
+            Category = BodyPartCategories.FullBody,
+            Description = "Test description",
+            Name = "Full Body Exercise",
+            WorkoutDayId = workoutDay.Id,
+            WorkoutDay = workoutDay
+        };
+        
+        _context.Exercises.Add(exercise);
+        await _context.SaveChangesAsync();
+        
+        // Act
+        Result<Exercise> exerciseResult = await _exerciseService.GetByIdAsync(Guid.NewGuid());
+        
+        // Assert
+        Assert.False(exerciseResult.IsSuccess);
+        Assert.Null(exerciseResult.Data);
+    }
 }

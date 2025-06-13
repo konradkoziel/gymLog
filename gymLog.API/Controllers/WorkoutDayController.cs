@@ -66,7 +66,7 @@ namespace gymLog.API.Controllers
         public async Task<IActionResult> DeleteWorkoutDay(Guid id)
         {
             var result = await _workoutDayService.DeleteAsync(id);
-            if (!result)
+            if (!result.IsSuccess)
             {
                 return NotFound();
             }
