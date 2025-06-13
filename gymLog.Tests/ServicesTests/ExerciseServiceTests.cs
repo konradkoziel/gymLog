@@ -20,16 +20,26 @@ public class ExerciseServiceTests {
         _context = new AppDbContext(options);
         _exerciseService = new ExerciseService(_context);
     }
-    
-    [Fact]
+
+    #region CreateExerciseTests
+
+     [Fact]
     public async Task CreateExercise_ShouldCreateExercise_WhenExerciseIsValid() {
         // Arrange
+        WorkoutDay workoutDay = new WorkoutDay() {
+            Id = Guid.NewGuid(),
+            Day = DayOfWeek.Friday,
+            Description = "Test",
+            Exercises = []
+        };
+        
         Exercise validExercise = new Exercise {
             Id = Guid.NewGuid(),
             Category = BodyPartCategories.FullBody,
             Description = "Test description",
             Name = "Full Body Exercise",
-            WorkoutDayId = Guid.NewGuid()
+            WorkoutDayId = workoutDay.Id,
+            WorkoutDay = workoutDay
         };
         
         // Act
@@ -71,4 +81,8 @@ public class ExerciseServiceTests {
         
         Assert.Equal(errorMessage, result.Message);
     }
+
+    #endregion
+    
+   
 }
