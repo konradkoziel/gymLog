@@ -1,6 +1,7 @@
 using gymLog.API.Services;
 using gymLog.API.Services.interfaces;
 using gymLog.Model;
+using Microsoft.AspNetCore.Mvc;
 
 namespace gymLog.API.Controllers
 {
@@ -24,7 +25,7 @@ namespace gymLog.API.Controllers
             try
             {
                 var workoutDays = await _workoutDayService.GetAllAsync();
-                _logService.LogInfo("Successfully retrieved {count} workout days", workoutDays.Count ?? 0);
+                _logService.LogInfo("Successfully retrieved {count} workout days", workoutDays.Count());
                 return Ok(workoutDays);
             }
             catch (Exception ex)
