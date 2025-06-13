@@ -84,5 +84,46 @@ public class ExerciseServiceTests {
 
     #endregion
     
-   
+    #region GetAllExercisesTests
+    
+    [Fact]
+    public async Task GetAllExercises_ShouldReturnAllExercises_WhenListIsNotEmpty() {
+        // Arrange
+        IEnumerable<Exercise> exampleExercises = Enumerable.Range(0, 10)
+            .Select(i => new Exercise {
+                Id = Guid.NewGuid(),
+                Category = BodyPartCategories.Abs,
+                Description = "Test description",
+                WorkoutDay = new WorkoutDay {
+                    Id = Guid.Empty,
+                    Day = DayOfWeek.Friday,
+                    Description = "Test",
+                    Exercises = []
+                },
+                WorkoutDayId = Guid.Empty,
+                Name = $"Exercise {i}"
+            });
+        
+        _context.Exercises.AddRange(exampleExercises);
+        await _context.SaveChangesAsync();
+        
+        // Act
+        IEnumerable<Exercise> exercises = await _exerciseService.GetAllAsync();
+        
+        // Assert
+        Assert.NotNull(exercises);
+        Assert.Equal(10, exercises.Count());
+    }
+    
+    [Fact]
+    public async Task GetAllExercises_ShouldReturnAllExercises_WhenListIsEmpty() {
+        // Act
+        IEnumerable<Exercise> exercises = await _exerciseService.GetAllAsync();
+        
+        // Assert
+        Assert.NotNull(exercises);
+        Assert.Empty(exercises);
+    }
+    
+    #endregion
 }
