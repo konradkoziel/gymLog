@@ -11,17 +11,17 @@ namespace gymLog.API.Services
             _logger = logger;
         }
 
-        public void LogInfo(string message, params object?[] parameters)
+        public void LogInfo(string message, params object[] parameters)
         {
             _logger.LogInformation(message, parameters);
         }
 
-        public void LogWarning(string message, params object?[] parameters)
+        public void LogWarning(string message, params object[] parameters)
         {
             _logger.LogWarning(message, parameters);
         }
 
-        public void LogError(Exception ex, string message, params object?[] parameters)
+        public void LogError(Exception ex, string message, params object[] parameters)
         {
             _logger.LogError(ex, message, parameters);
         }

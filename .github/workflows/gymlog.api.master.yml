@@ -1,14 +1,16 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy ASP.Net Core app to Azure Web App - gymlog
-
+name: Backend Build & Deploy (.NET)
 on:
   push:
-    branches:
-      - master
+    branches: master
+    paths:
+      - gymLog.API/**
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: windows-latest
@@ -21,7 +23,7 @@ jobs:
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.x'
+          dotnet-version: 'v9.0'
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
@@ -54,9 +56,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_6D716090DBC94F568E010DA7664E3F04 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_5CF23F35D5FE4824B6D77468B4549A78 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_D095DBCAFC3E40E8BF0A63B5B9443E34 }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -65,4 +67,3 @@ jobs:
           app-name: 'gymlog'
           slot-name: 'Production'
           package: .
-          
