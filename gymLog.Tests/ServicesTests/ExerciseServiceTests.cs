@@ -310,4 +310,46 @@ public class ExerciseServiceTests {
     }
     
     #endregion
+
+    #region DeleteExerciseTests
+
+    [Fact]
+    public async Task DeleteExercise_ShouldDeleteExercise_WhenExerciseExists() {
+        // Arrange
+        WorkoutDay workoutDay = new WorkoutDay() {
+            Id = Guid.NewGuid(),
+            Day = DayOfWeek.Friday,
+            Description = "Test",
+            Exercises = []
+        };
+        
+        Exercise validExercise = new Exercise {
+            Id = Guid.NewGuid(),
+            Category = BodyPartCategories.FullBody,
+            Description = "Test description",
+            Name = "Full Body Exercise",
+            WorkoutDayId = workoutDay.Id,
+            WorkoutDay = workoutDay
+        };
+        _context.Exercises.Add(validExercise);
+        await _context.SaveChangesAsync();
+        
+        // Act
+        Result<bool> deleteExerciseResult = await _exerciseService.DeleteAsync(validExercise.Id);
+        
+        // Assert
+        Assert.True(deleteExerciseResult.IsSuccess);
+        Assert.Empty(_context.Exercises.ToList());
+    }
+
+    [Fact]
+    public async Task DeleteExercise_ShouldNotDeleteExercise_WhenExerciseDoesNotExist() {
+        // Act
+        Result<bool> deleteExerciseResult = await _exerciseService.DeleteAsync(Guid.NewGuid());
+        
+        // Assert
+        Assert.False(deleteExerciseResult.IsSuccess);
+    }
+
+    #endregion
 }
