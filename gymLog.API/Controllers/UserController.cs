@@ -23,9 +23,13 @@ namespace gymLog.API.Controllers
             _logService.LogInfo("Received request to get all exercises");
             try
             {
-                var exercises = await _service.GetAllAsync();
-                _logService.LogInfo("Successfully retrieved {count} exercises", exercises.Count());
-                return Ok(exercises);
+                var exercisesResult = await _service.GetAllAsync();
+                if (exercisesResult.IsSuccess) {
+                    _logService.LogInfo("Successfully retrieved {count} exercises", exercisesResult.Data!.Count());
+                    return Ok(exercisesResult);
+                } else {
+                    return BadRequest(exercisesResult.Message);
+                }
             }
             catch (Exception ex)
             {
@@ -91,8 +95,9 @@ namespace gymLog.API.Controllers
                 if (createdUserResult.IsSuccess) {
                     _logService.LogInfo("Successfully created new user with ID {id}", createdUserResult.Data!.Id);
                     return CreatedAtAction(nameof(GetExercise), new { id = createdUserResult.Data!.Id }, createdUserResult);
+                } else {
+                    return BadRequest(createdUserResult.Message);
                 }
-               
             }
             catch (Exception ex)
             {
