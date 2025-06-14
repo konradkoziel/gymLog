@@ -1,4 +1,4 @@
-name: Frontend Build & Deploy (React)
+name: Frontend Build & Deploy (Angular)
 on:
   push:
     branches: master
@@ -21,11 +21,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: "20"
       - name: Install dependencies
         working-directory: gymlog.gui
         run: npm install
-      - name: Build React app
+      - name: Build app
         working-directory: gymlog.gui
         run: npm run build
       - name: Upload built app
@@ -50,4 +50,4 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: upload
           skip_app_build: true
-          app_location: gymlog-app
+          app_location: gymlog-app/gymlog.gui/browser
