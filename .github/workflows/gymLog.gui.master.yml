@@ -1,0 +1,53 @@
+name: Frontend Build & Deploy (Angular)
+on:
+  push:
+    branches: master
+    paths:
+      - gymlog.gui/**
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build
+    steps:
+      - name: Git clone repository
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install dependencies
+        working-directory: gymlog.gui
+        run: npm install
+      - name: Build app
+        working-directory: gymlog.gui
+        run: npm run build
+      - name: Upload built app
+        uses: actions/upload-artifact@v4
+        with:
+         name: gymlog-app
+         path: gymlog.gui/dist
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy
+    needs: build
+    steps:
+      - name: Download built app
+        uses: actions/download-artifact@v4
+        with:
+          name: gymlog-app
+          path: gymlog-app
+      - name: Deploy to azure
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_MANGO_PEBBLE_03391E403 }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: upload
+          skip_app_build: true
+          app_location: gymlog-app/gymlog.gui/browser
