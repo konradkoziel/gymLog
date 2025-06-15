@@ -1,6 +1,6 @@
-﻿using gymLog.Model;
+﻿using Microsoft.AspNetCore.Mvc;
+using gymLog.Model;
 using gymLog.API.Services.interfaces;
-using Microsoft.AspNetCore.Mvc;
 
 namespace gymLog.API.Controllers
 {
@@ -23,9 +23,14 @@ namespace gymLog.API.Controllers
             _logService.LogInfo("Getting all exercises");
             try
             {
-                var exercises = await _service.GetAllAsync();
-                _logService.LogInfo("Got {count} exercises", exercises.Count());
-                return Ok(exercises);
+                var exercisesResult = await _service.GetAllAsync();
+                if (exercisesResult.IsSuccess) {
+                    _logService.LogInfo("Got {count} exercises", exercisesResult.Data.Count());
+                    return Ok(exercisesResult);
+                } else {
+                    return BadRequest(exercisesResult.Message);
+                }
+                
             }
             catch (Exception ex)
             {
@@ -40,15 +45,15 @@ namespace gymLog.API.Controllers
             _logService.LogInfo("Getting exercise with ID {id}", id);
             try
             {
-                var exercise = await _service.GetByIdAsync(id);
+                var exerciseResult = await _service.GetByIdAsync(id);
 
-                if (exercise == null)
+                if (exerciseResult.Data == null)
                 {
                     _logService.LogWarning("Exercise with ID {id} not found", id);
                     return NotFound();
                 }
 
-                return Ok(exercise);
+                return Ok(exerciseResult);
             }
             catch (Exception ex)
             {
@@ -86,9 +91,13 @@ namespace gymLog.API.Controllers
             _logService.LogInfo("Creating new exercise");
             try
             {
-                var created = await _service.CreateAsync(exercise);
-                _logService.LogInfo("Exercise created with ID {id}", created.Id);
-                return CreatedAtAction(nameof(GetExercise), new { id = created.Id }, created);
+                var createdExerciseResult = await _service.CreateAsync(exercise);
+                if (createdExerciseResult.IsSuccess) {
+                    _logService.LogInfo("Exercise created with ID {id}", createdExerciseResult.Data.Id);
+                    return CreatedAtAction(nameof(GetExercise), new { id = createdExerciseResult.Data!.Id }, createdExerciseResult);
+                } else {
+                    return BadRequest(createdExerciseResult.Message);
+                }
             }
             catch (Exception ex)
             {
@@ -98,26 +107,21 @@ namespace gymLog.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteExercise(Guid id)
-        {
+        public async Task<IActionResult> DeleteExercise(Guid id) {
             _logService.LogInfo("Deleting exercise with ID {id}", id);
-            try
-            {
+            try {
                 var result = await _service.DeleteAsync(id);
-                if (!result)
-                {
+                if (!result.IsSuccess) {
                     _logService.LogWarning("Exercise with ID {id} not found for deletion", id);
                     return NotFound();
                 }
 
-                _logService.LogInfo("Exercise with ID {id} deleted", id);
                 return NoContent();
-            }
-            catch (Exception ex)
-            {
-                _logService.LogError(ex, "Error while deleting exercise with ID {id}", id);
+            } catch (Exception ex) {
+                _logService.LogError(ex, "Error while deleting exercise");
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
             }
         }
     }
 }
+

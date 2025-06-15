@@ -2,34 +2,36 @@ using gymLog.API.Services;
 using gymLog.API.Services.interfaces;
 using gymLog.Model;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace gymLog.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class WorkoutDayController : ControllerBase
-    {
+    public class WorkoutDayController : ControllerBase {
         private readonly IWorkoutDayService _workoutDayService;
         private readonly ILogService _logService;
 
-        public WorkoutDayController(IWorkoutDayService workoutDayService, ILogService logService)
-        {
+        public WorkoutDayController(IWorkoutDayService workoutDayService, ILogService logService) {
             _workoutDayService = workoutDayService;
             _logService = logService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<WorkoutDay>>> GetWorkoutDays()
-        {
+        public async Task<ActionResult<IEnumerable<WorkoutDay>>> GetWorkoutDays() {
             _logService.LogInfo("Received request to get all workout days");
-            try
-            {
-                var workoutDays = await _workoutDayService.GetAllAsync();
-                _logService.LogInfo("Successfully retrieved {count} workout days", workoutDays.Count());
-                return Ok(workoutDays);
-            }
-            catch (Exception ex)
-            {
+            try {
+                var workoutDaysResult = await _workoutDayService.GetAllAsync();
+                if (workoutDaysResult.IsSuccess) {
+                    _logService.LogInfo("Successfully retrieved {count} workout days", workoutDaysResult.Data!.Count());
+                    return Ok(workoutDaysResult);
+                } else {
+                    return NotFound();
+                }
+
+            } catch (Exception ex) {
                 _logService.LogError(ex, "Error occurred while getting all workout days");
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
             }
@@ -41,16 +43,16 @@ namespace gymLog.API.Controllers
             _logService.LogInfo("Received request to get workout day with ID {id}", id);
             try
             {
-                var workoutDay = await _workoutDayService.GetByIdAsync(id);
+                var workoutDayResult = await _workoutDayService.GetByIdAsync(id);
 
-                if (workoutDay == null)
+                if (workoutDayResult.Data == null)
                 {
                     _logService.LogWarning("Workout day with ID {id} not found", id);
-                    return NotFound();
+                    return BadRequest();
                 }
 
                 _logService.LogInfo("Successfully retrieved workout day with ID {id}", id);
-                return Ok(workoutDay);
+                return Ok(workoutDayResult);
             }
             catch (Exception ex)
             {
@@ -71,9 +73,13 @@ namespace gymLog.API.Controllers
                     return BadRequest();
                 }
 
-                var updatedWorkoutDay = await _workoutDayService.UpdateAsync(workoutDay);
-                _logService.LogInfo("Successfully updated workout day with ID {id}", id);
-                return Ok(updatedWorkoutDay);
+                var updatedWorkoutDayResult = await _workoutDayService.UpdateAsync(workoutDay);
+                if (updatedWorkoutDayResult.IsSuccess) {
+                    _logService.LogInfo("Successfully updated workout day with ID {id}", id);
+                    return Ok(updatedWorkoutDayResult);
+                } else {
+                    return BadRequest();
+                }
             }
             catch (Exception ex)
             {
@@ -88,9 +94,13 @@ namespace gymLog.API.Controllers
             _logService.LogInfo("Received request to create a new workout day");
             try
             {
-                var createdWorkoutDay = await _workoutDayService.CreateAsync(workoutDay);
-                _logService.LogInfo("Successfully created new workout day with ID {id}", createdWorkoutDay.Id);
-                return CreatedAtAction(nameof(GetWorkoutDay), new { id = createdWorkoutDay.Id }, createdWorkoutDay);
+                var createdWorkoutDayResult = await _workoutDayService.CreateAsync(workoutDay);
+                if (createdWorkoutDayResult.IsSuccess) {
+                    _logService.LogInfo("Successfully created new workout day with ID {id}", createdWorkoutDayResult.Data!.Id);
+                    return CreatedAtAction(nameof(GetWorkoutDay), new { id = createdWorkoutDayResult.Data!.Id }, createdWorkoutDayResult);
+                } else {
+                    return BadRequest();
+                }
             }
             catch (Exception ex)
             {
@@ -106,7 +116,7 @@ namespace gymLog.API.Controllers
             try
             {
                 var result = await _workoutDayService.DeleteAsync(id);
-                if (!result)
+                if (!result.IsSuccess)
                 {
                     _logService.LogWarning("Failed to delete workout day with ID {id}, not found", id);
                     return NotFound();

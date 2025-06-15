@@ -10,7 +10,7 @@
         public decimal Weight { get; set; }
         public decimal Height { get; set; }
         public DateTime CreatedAt { get; set; }
-        public ICollection<WorkoutPlan>  WorkoutPlans{ get; set; }
+        public ICollection<WorkoutPlan> WorkoutPlans { get; set; }
 
     }
 }
