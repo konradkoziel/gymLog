@@ -1,3 +1,4 @@
+using gymLog.API.Middleware;
 using gymLog.API.Services;
 using gymLog.API.Services.interfaces;
 using gymLog.Entity;
@@ -45,7 +46,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 var app = builder.Build();
-
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseSwagger();
 app.UseSwaggerUI();
