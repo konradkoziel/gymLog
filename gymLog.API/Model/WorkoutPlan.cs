@@ -7,7 +7,6 @@
         public string Description { get; set; }
         public ICollection<DayOfWeek> WorkoutSelectedDays { get; set; }
         public ICollection<WorkoutDay> WorkoutDays { get; set; }
-        
         public Guid UserId { get; set; }
         public User User { get; set; }
     }
