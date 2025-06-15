@@ -23,9 +23,9 @@ namespace gymLog.API.Controllers
             _logService.LogInfo("Received request to get all workout plans");
             try
             {
-                var workoutPlans = await _workoutPlanService.GetAllAsync();
-                _logService.LogInfo("Successfully retrieved {count} workout plans", workoutPlans.Count());
-                return Ok(workoutPlans);
+                var workoutPlansResult = await _workoutPlanService.GetAllAsync();
+                _logService.LogInfo("Successfully retrieved {count} workout plans", workoutPlansResult.Data.Count());
+                return Ok(workoutPlansResult);
             }
             catch (Exception ex)
             {
@@ -40,16 +40,16 @@ namespace gymLog.API.Controllers
             _logService.LogInfo("Received request to get workout plan with ID {id}", id);
             try
             {
-                var workoutPlan = await _workoutPlanService.GetByIdAsync(id);
+                var workoutPlanResult = await _workoutPlanService.GetByIdAsync(id);
 
-                if (workoutPlan == null)
+                if (workoutPlanResult.Data == null)
                 {
                     _logService.LogWarning("Workout plan with ID {id} not found", id);
                     return NotFound();
                 }
 
                 _logService.LogInfo("Successfully retrieved workout plan with ID {id}", id);
-                return Ok(workoutPlan);
+                return Ok(workoutPlanResult);
             }
             catch (Exception ex)
             {
@@ -70,9 +70,9 @@ namespace gymLog.API.Controllers
                     return BadRequest();
                 }
 
-                var updatedWorkoutPlan = await _workoutPlanService.UpdateAsync(workoutPlan);
+                var updatedWorkoutPlanResult = await _workoutPlanService.UpdateAsync(workoutPlan);
                 _logService.LogInfo("Successfully updated workout plan with ID {id}", id);
-                return Ok(updatedWorkoutPlan);
+                return Ok(updatedWorkoutPlanResult);
             }
             catch (Exception ex)
             {
@@ -87,9 +87,9 @@ namespace gymLog.API.Controllers
             _logService.LogInfo("Received request to create a new workout plan");
             try
             {
-                var createdWorkoutPlan = await _workoutPlanService.CreateAsync(workoutPlan);
-                _logService.LogInfo("Successfully created new workout plan with ID {id}", createdWorkoutPlan.Id);
-                return CreatedAtAction(nameof(GetWorkoutPlan), new { id = createdWorkoutPlan.Id }, createdWorkoutPlan);
+                var createdWorkoutPlanResult = await _workoutPlanService.CreateAsync(workoutPlan);
+                _logService.LogInfo("Successfully created new workout plan with ID {id}", createdWorkoutPlanResult.Data.Id);
+                return CreatedAtAction(nameof(GetWorkoutPlan), new { id = createdWorkoutPlanResult.Data.Id }, createdWorkoutPlanResult);
             }
             catch (Exception ex)
             {
@@ -105,7 +105,7 @@ namespace gymLog.API.Controllers
             try
             {
                 var result = await _workoutPlanService.DeleteAsync(id);
-                if (!result)
+                if (!result.IsSuccess)
                 {
                     _logService.LogWarning("Failed to delete workout plan with ID {id}, not found", id);
                     return NotFound();
