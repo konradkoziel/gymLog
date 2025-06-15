@@ -50,4 +50,4 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: upload
           skip_app_build: true
-          app_location: gymlog-app/gymlog.UI/browser
+          app_location: gymlog-app/gymlog.ui/browser
