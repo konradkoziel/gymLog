@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "gymlog.gui": {
+    "gymlog.ui": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -23,7 +23,12 @@
             ],
             "styles": [
               "src/styles.css"
-            ]
+            ],
+            "server": "src/main.server.ts",
+            "outputMode": "server",
+            "ssr": {
+              "entry": "src/server.ts"
+            }
           },
           "configurations": {
             "production": {
@@ -53,10 +58,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "gymlog.gui:build:production"
+              "buildTarget": "gymlog.ui:build:production"
             },
             "development": {
-              "buildTarget": "gymlog.gui:build:development"
+              "buildTarget": "gymlog.ui:build:development"
             }
           },
           "defaultConfiguration": "development"
