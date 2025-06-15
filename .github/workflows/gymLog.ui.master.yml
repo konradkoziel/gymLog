@@ -3,7 +3,7 @@ on:
   push:
     branches: master
     paths:
-      - gymlog.gui/**
+      - gymlog.UI/**
   pull_request:
     types:
       - opened
@@ -23,16 +23,16 @@ jobs:
         with:
           node-version: "20"
       - name: Install dependencies
-        working-directory: gymlog.gui
+        working-directory: gymlog.UI
         run: npm install
       - name: Build app
-        working-directory: gymlog.gui
+        working-directory: gymlog.UI
         run: npm run build
       - name: Upload built app
         uses: actions/upload-artifact@v4
         with:
          name: gymlog-app
-         path: gymlog.gui/dist
+         path: gymlog.UI/dist
   deploy:
     runs-on: ubuntu-latest
     name: Deploy
@@ -50,4 +50,4 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: upload
           skip_app_build: true
-          app_location: gymlog-app/gymlog.gui/browser
+          app_location: gymlog-app/gymlog.UI/browser
