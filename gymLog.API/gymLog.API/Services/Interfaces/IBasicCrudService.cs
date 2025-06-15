@@ -1,4 +1,4 @@
-﻿using gymLog.API.Model.DTO;
+﻿using gymLog.API.Model;
 
 namespace gymLog.API.Services.interfaces
 {

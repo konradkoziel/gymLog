@@ -1,6 +1,8 @@
-﻿namespace gymLog.API.Model.DTO;
+﻿using Microsoft.AspNetCore.Mvc;
 
-public class Result<T> {
+namespace gymLog.API.Model;
+
+public class Result<T>  {
     public bool IsSuccess { get; }
     public string Message { get; }
     public IEnumerable<string>? Errors { get; }

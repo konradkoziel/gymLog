@@ -52,6 +52,9 @@ namespace gymLog.Entity
             {
                 wd.HasKey(x => x.Id);
                 wd.Property(x => x.Description).HasColumnType("varchar(500)");
+                wd.HasOne(x => x.WorkoutPlan)
+                  .WithMany(wp => wp.WorkoutDays)
+                  .HasForeignKey("WorkoutPlanId");
                 wd.HasMany(x => x.Exercises)
                   .WithOne(e => e.WorkoutDay)
                   .HasForeignKey("WorkoutDayId");
