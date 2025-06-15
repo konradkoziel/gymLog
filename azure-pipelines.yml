@@ -1,0 +1,132 @@
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - gymLog.API/**
+pr:
+  branches:
+    include:
+      - master
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  buildConfiguration: 'Release'
+  solutionPath: 'gymLog.API/'
+
+
+stages:
+  - stage: Build
+    jobs:
+      - job: Analyze
+        steps:
+
+        - checkout: self
+          displayName: 'Git clone'
+
+        - task: SonarCloudPrepare@3
+          condition:  eq(variables['Build.Reason'], 'PullRequest')
+          displayName: Prepare SonarCloud (PullRequest)
+          inputs:
+            SonarQube: 'SonarCloud'
+            organization: 'azuregymlog'
+            scannerMode: 'dotnet'
+            projectKey: 'konrad981204_GymLog'
+            projectName: 'GymLog'
+            extraProperties: |
+              sonar.pullrequest.key=$(System.PullRequest.PullRequestNumber)
+              sonar.pullrequest.branch=$(System.PullRequest.SourceBranch)
+              sonar.pullrequest.base=$(System.PullRequest.TargetBranch)   
+
+        - task: SonarCloudPrepare@3
+          condition: and(eq(variables['Build.SourceBranch'], 'refs/heads/master'), ne(variables['Build.Reason'], 'PullRequest'))
+          displayName: Prepare SonarCloud (Branch)
+          inputs:
+            SonarQube: 'SonarCloud'
+            organization: 'azuregymlog'
+            scannerMode: 'dotnet'
+            projectKey: 'konrad981204_GymLog'
+            projectName: 'GymLog' 
+
+        - script: dotnet build $(solutionPath) --configuration $(buildConfiguration)
+          displayName: 'Build app'
+
+        - task: SonarCloudAnalyze@3
+          displayName: Analyze SonarCloud
+          inputs:
+            jdkversion: 'JAVA_HOME_17_X64'
+        - task: SonarCloudPublish@3
+          displayName: Publish SonarCloud
+          inputs:
+            pollingTimeoutSec: '300'
+
+      - job: Test
+        steps:
+        - script: dotnet test $(solutionPath) --configuration $(buildConfiguration) --no-build
+          displayName: 'Run tests'
+
+      - job: Publish
+        dependsOn:
+        - Analyze
+        - Test
+        steps:
+        - script: dotnet publish $(solutionPath) -c Release -o $(Build.ArtifactStagingDirectory)
+          displayName: 'Publish app'
+
+        - publish: $(Build.ArtifactStagingDirectory)
+          artifact: drop-$(Build.BuildId)
+          displayName: 'Publish artifact'
+
+
+
+  # - stage: Build
+  #   condition: eq(variables['Build.Reason'], 'PullRequest')
+  #   jobs:
+  #     - job: Compile
+  #       steps:
+
+  #       - checkout: self
+  #         displayName: 'Git clone'
+
+  #       - script: dotnet build $(solutionPath) --configuration $(buildConfiguration)
+  #         displayName: 'Build app'
+
+  #     - job: Test
+  #       steps:
+  #       - script: dotnet test $(solutionPath) --configuration $(buildConfiguration) --no-build
+  #         displayName: 'Run tests'
+
+
+
+  - stage: Deploy
+    condition: and(eq(variables['Build.SourceBranch'], 'refs/heads/master'), ne(variables['Build.Reason'], 'PullRequest'))
+    jobs:
+      - deployment: production
+        environment: production
+        strategy:
+         runOnce:
+           deploy:
+             steps:
+              - download: current
+                artifact: drop-$(Build.BuildId)
+
+              - task: ArchiveFiles@2
+                displayName: 'Pack to ZIP'
+                inputs:
+                  rootFolderOrFile: '$(Pipeline.Workspace)/drop-$(Build.BuildId)'
+                  includeRootFolder: false
+                  archiveType: 'zip'
+                  archiveFile: '$(Pipeline.Workspace)/drop-$(Build.BuildId)/app.zip'
+                  replaceExistingArchive: true
+
+              - task: AzureRmWebAppDeployment@5
+                inputs:
+                  ConnectionType: 'AzureRM'
+                  azureSubscription: 'Subskrypcja platformy Azure 1(932e1d67-df84-4d48-b484-8e29be5f1a82)'
+                  appType: 'webAppLinux'
+                  WebAppName: 'gymlog'
+                  packageForLinux: '$(Pipeline.Workspace)/drop-$(Build.BuildId)/app.zip'
+                  DeploymentTypeLinux: 'oneDeploy'
