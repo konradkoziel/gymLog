@@ -1,0 +1,65 @@
+# =============== Backend: ASP.NET Core 9 ===============
+
+# Build outputs
+gymlog.API/gymlog.API/bin/
+gymlog.API/gymlog.API/obj/
+gymlog.API/gymlog.API/*.user
+gymlog.API/gymlog.API/*.suo
+
+gymlog.API/gymlog.Tests/bin/
+gymlog.API/gymlog.Tests/obj/
+gymlog.API/gymlog.Tests/*.user
+gymlog.API/gymlog.Tests/*.suo
+
+# NuGet packages and artifacts
+**/packages/
+**/artifacts/
+
+# VS and IDE folders
+.vs/
+.vscode/
+.idea/
+
+# JetBrains IDE specific files
+*.iml
+*.iws
+*.ipr
+out/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+
+# Test results
+TestResults/
+*.trx
+*.coverage
+
+# Dotnet binary logs
+*.binlog
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# EF Core migrations metadata
+*.dbmdl
+
+# =============== Frontend: Angular 20 ===============
+
+# Node modules
+gymlog.UI/node_modules/
+
+# Angular build output
+gymlog.UI/dist/
+gymlog.UI/out-tsc/
+
+# Environment files (optional)
+gymlog.UI/src/environments/*.local.ts
+gymlog.UI/src/environments/*.prod.ts
+
+# Logs
+gymlog.UI/*.log
+
+# Temp files
+*.tmp
