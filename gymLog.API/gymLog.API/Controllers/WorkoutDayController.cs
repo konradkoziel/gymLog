@@ -1,4 +1,5 @@
 using gymLog.API.Model;
+using gymLog.API.Model.DTO.WorkoutDayDto;
 using gymLog.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,57 +9,50 @@ namespace gymLog.API.Controllers;
 [ApiController]
 public class WorkoutDayController : ControllerBase
 {
-    private readonly IWorkoutDayService _workoutDayService;
+    private readonly IWorkoutDayService _service;
 
     public WorkoutDayController(IWorkoutDayService workoutDayService)
     {
-        _workoutDayService = workoutDayService;
+        _service = workoutDayService;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<WorkoutDay>>> GetWorkoutDays()
+    [HttpGet("all/{workoutPlanId:guid}")]
+    public async Task<ActionResult<IEnumerable<WorkoutDay>>> GetWorkoutDays(Guid workoutPlanId)
     {
-        var workoutDays = await _workoutDayService.GetAllAsync();
-        return Ok(workoutDays);
+        var result = await _service.GetAllWorkoutDays(workoutPlanId);
+        if (result.IsSuccess) return Ok(result.Data);
+        return BadRequest(result.Message);
     }
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<WorkoutDay>> GetWorkoutDay(Guid id)
+    [HttpGet("{workoutDayId:guid}")]
+    public async Task<ActionResult<WorkoutDay>> GetWorkoutDay(Guid workoutDayId)
     {
-        var workoutDay = await _workoutDayService.GetByIdAsync(id);
-
-        if (workoutDay == null) return NotFound();
-
-        return Ok(workoutDay);
+        var result = await _service.GetWorkoutDayById(workoutDayId);
+        if (result.IsSuccess) return Ok(result.Data);
+        return BadRequest(result.Message);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutWorkoutDay(Guid id, WorkoutDay workoutDay)
+    public async Task<IActionResult> PutWorkoutDay(Guid workoutDayId, CreateWorkoutDayDto workoutDayDto)
     {
-        if (id != workoutDay.Id) return BadRequest();
-
-        var updatedWorkoutDay = await _workoutDayService.UpdateAsync(workoutDay);
-        return Ok(updatedWorkoutDay);
+        var result = await _service.UpdateWorkoutDay(workoutDayId, workoutDayDto);
+        if (result.IsSuccess) return Ok(result.Data);
+        return BadRequest(result.Message);
     }
 
-    [HttpPost]
-    public async Task<ActionResult<WorkoutDay>> PostWorkoutDay(WorkoutDay workoutDay)
+    [HttpPost("{workoutPlanId:guid}")]
+    public async Task<ActionResult<WorkoutDay>> PostWorkoutDay(Guid workoutPlanId, CreateWorkoutDayDto workoutDayDto)
     {
-        var createdWorkoutDayResult = await _workoutDayService.CreateAsync(workoutDay);
-
-        if (createdWorkoutDayResult.IsSuccess)
-            return CreatedAtAction(nameof(GetWorkoutDay), new { id = createdWorkoutDayResult.Data!.Id },
-                createdWorkoutDayResult.Data);
-
-        return BadRequest(createdWorkoutDayResult);
+        var result = await _service.CreateWorkoutDay(workoutPlanId, workoutDayDto);
+        if (result.IsSuccess) return Ok(result.Data);
+        return BadRequest(result.Message);
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteWorkoutDay(Guid id)
+    [HttpDelete("{workoutDayId:guid}")]
+    public async Task<IActionResult> DeleteWorkoutDay(Guid workoutDayId)
     {
-        var result = await _workoutDayService.DeleteAsync(id);
-        if (!result.IsSuccess) return NotFound();
-
-        return NoContent();
+        var result = await _service.RemoveWorkoutDay(workoutDayId);
+        if (result.IsSuccess) return Ok(result.Data);
+        return BadRequest(result.Message);
     }
 }

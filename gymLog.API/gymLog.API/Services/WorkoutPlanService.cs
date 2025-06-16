@@ -21,6 +21,14 @@ public class WorkoutPlanService(AppDbContext context, IMapper mapper) : IWorkout
         return Result<IEnumerable<PlanDto>>.Success(workoutPlansDto);
     }
 
+    public async Task<Result<PlanDto>> GetWorkoutPlanById(Guid workoutPlanId)
+    {
+        var workoutPlan = await _context.WorkoutPlans.FindAsync(workoutPlanId);
+        if (workoutPlan == null) return Result<PlanDto>.Failure("Not found");
+        var workoutPlanDto = _mapper.Map<PlanDto>(workoutPlan);
+        return Result<PlanDto>.Success(workoutPlanDto);
+    }
+
     public async Task<Result<PlanDto>> CreateWorkoutPlan(Guid userId, CreatePlanDto createPlanDto)
     {
         var workoutPlan = _mapper.Map<WorkoutPlan>(createPlanDto);
@@ -30,12 +38,11 @@ public class WorkoutPlanService(AppDbContext context, IMapper mapper) : IWorkout
         return Result<PlanDto>.Success(_mapper.Map<PlanDto>(workoutPlan));
     }
 
-    public async Task<Result<PlanDto>> UpdateWorkoutPlan(Guid workoutPlanId, Guid userId, CreatePlanDto createPlanDto)
+    public async Task<Result<PlanDto>> UpdateWorkoutPlan(Guid workoutPlanId, CreatePlanDto createPlanDto)
     {
         var workoutPlan = await _context.WorkoutPlans.FindAsync(workoutPlanId);
         
         if (workoutPlan == null) return Result<PlanDto>.Failure("Not found");
-        if (workoutPlan.UserId != userId) return Result<PlanDto>.Failure("Permission denied");
         
         _mapper.Map(createPlanDto, workoutPlan);
         _context.WorkoutPlans.Update(workoutPlan);
@@ -44,12 +51,11 @@ public class WorkoutPlanService(AppDbContext context, IMapper mapper) : IWorkout
         return Result<PlanDto>.Success(_mapper.Map<PlanDto>(workoutPlan));
     }
 
-    public async Task<Result<bool>> RemoveWorkoutPlan(Guid workoutId, Guid userId)
+    public async Task<Result<bool>> RemoveWorkoutPlan(Guid workoutId)
     {
         var workoutPlan = await _context.WorkoutPlans.FindAsync(workoutId);
         
         if (workoutPlan == null) return Result<bool>.Failure("Not found");
-        if (workoutPlan.UserId != userId) return Result<bool>.Failure("Permission denied");
         
         _context.WorkoutPlans.Remove(workoutPlan);
         await _context.SaveChangesAsync();
