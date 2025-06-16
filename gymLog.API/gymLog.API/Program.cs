@@ -1,11 +1,11 @@
 using gymLog.API.Middleware;
 using gymLog.API.Services;
 using gymLog.API.Services.interfaces;
-using gymLog.Entity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using gymLog.API.Entity;
 
 var builder = WebApplication.CreateBuilder(args);
 

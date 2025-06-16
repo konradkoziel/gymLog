@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using gymLog.API.Model;
+using Microsoft.AspNetCore.Mvc;
 using gymLog.Model;
 using gymLog.API.Services.interfaces;
 

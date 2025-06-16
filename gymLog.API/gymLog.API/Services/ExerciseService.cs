@@ -1,39 +1,69 @@
-﻿using gymLog.API.Model;
+﻿using AutoMapper;
+using gymLog.API.Entity;
+using gymLog.API.Model;
+using gymLog.API.Model.DTO;
+using gymLog.API.Model.DTO.ExerciseDto;
 using gymLog.API.Services.interfaces;
-using gymLog.Entity;
-using gymLog.Model;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace gymLog.API.Services
 {
-    public class ExerciseService(AppDbContext context) : BasicCrudService<gymLog.Model.Exercise>(context), IExerciseService
+    public class ExerciseService :  IExerciseService
     {
-        public override async Task<Result<gymLog.Model.Exercise>> CreateAsync(gymLog.Model.Exercise exercise) {
-            if (string.IsNullOrEmpty(exercise.Name))
-                return Result<gymLog.Model.Exercise>.Failure("Exercise has no name", null);
-            
-            if (exercise.WorkoutDay == null)
-                return Result<gymLog.Model.Exercise>.Failure("Exercise has no workout day", null);
-            
-            if (exercise.Category == null)
-                return Result<gymLog.Model.Exercise>.Failure("Exercise has no category", null);
-            
-            return await base.CreateAsync(exercise);
+        private readonly IMapper _mapper;
+        private readonly AppDbContext _context;
+
+        public ExerciseService(AppDbContext context, IMapper mapper, ILogService logService)
+        {
+            _mapper = mapper;
+            _context = context;
         }
 
-        public override async Task<Result<gymLog.Model.Exercise?>> UpdateAsync(gymLog.Model.Exercise exercise) {
-            if (GetByIdAsync(exercise.Id).Result.Data == null)
-                return Result<gymLog.Model.Exercise?>.Failure("Exercise does not exist", null);
+        public async Task<Result<IEnumerable<ExerciseDto>>> GetAllExercises(Guid workoutDayId)
+        {
+            var exercises = await _context.Exercises.Where(e => e.WorkoutDayId == workoutDayId).ToListAsync();
+            if (exercises.Count != 0)
+            {
+                Result<List<ExerciseDto>>.Failure("Not found");
+            }
+            var execricesDto = _mapper.Map<List<ExerciseDto>>(exercises);
+            return Result<IEnumerable<ExerciseDto>>.Success(execricesDto);
             
-            if (string.IsNullOrEmpty(exercise.Name))
-                return Result<gymLog.Model.Exercise?>.Failure("Exercise has no name", null);
-            
-            if (exercise.WorkoutDay == null)
-                return Result<gymLog.Model.Exercise?>.Failure("Exercise has no workout day", null);
-            
-            if (exercise.Category == null)
-                return Result<gymLog.Model.Exercise?>.Failure("Exercise has no category", null);
-            
-            return await base.UpdateAsync(exercise);
+        }
+
+        public async Task<Result<ExerciseDto>> CreateExercise(Guid workoutDayId, ExerciseDto exerciseDto)
+        {
+            var exercise = _mapper.Map<Exercise>(exerciseDto);
+            exercise.WorkoutDayId = workoutDayId;
+            _context.Add(exercise);
+            await _context.SaveChangesAsync();
+            return Result<ExerciseDto>.Success(_mapper.Map<ExerciseDto>(exercise));
+        }
+        
+        public async Task<Result<ExerciseDto>> UpdateExercise(Guid exerciseId, ExerciseDto exerciseDto)
+        {
+            var exercise = await _context.Exercises.FindAsync(exerciseId);
+            if (exercise == null)
+            {
+                return Result<ExerciseDto>.Failure("Not found");
+            }
+            _mapper.Map(exerciseDto, exercise);
+            _context.Exercises.Update(exercise);
+            await _context.SaveChangesAsync();
+            return Result<ExerciseDto>.Success(_mapper.Map<ExerciseDto>(exercise));
+        }
+        
+        public async Task<Result<bool>> RemoveExercise(Guid exerciseId)
+        {
+            var exercise = await _context.Exercises.FindAsync(exerciseId);
+            if (exercise == null)
+            {
+                return Result<bool>.Failure("Not found");
+            }
+            _context.Exercises.Remove(exercise);
+            await _context.SaveChangesAsync();
+            return Result<bool>.Success(true);
         }
     }
 }

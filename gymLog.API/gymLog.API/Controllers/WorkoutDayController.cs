@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using gymLog.API.Model;
 
 namespace gymLog.API.Controllers
 {

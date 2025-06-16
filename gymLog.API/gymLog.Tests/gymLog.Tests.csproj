@@ -24,4 +24,8 @@
       <ProjectReference Include="..\gymLog.API\gymLog.API.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="ServicesTests\" />
+    </ItemGroup>
+
 </Project>

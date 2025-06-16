@@ -1,4 +1,5 @@
-﻿using gymLog.Model;
+﻿using gymLog.API.Model;
+using gymLog.Model;
 
 namespace gymLog.API.Services.interfaces
 {
