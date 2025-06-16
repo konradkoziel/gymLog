@@ -21,6 +21,14 @@ public class WorkoutDayService(AppDbContext context, IMapper mapper) : IWorkoutD
         return Result<IEnumerable<WorkoutDayDto>>.Success(workoutDaysDto);
     }
 
+    public async Task<Result<WorkoutDayDto>> GetWorkoutDayById(Guid workoutDayId)
+    {
+        var workoutDay = await _context.WorkoutDays.FindAsync(workoutDayId);
+        if (workoutDay == null) return Result<WorkoutDayDto>.Failure("Not found");
+        var workoutDayDto = _mapper.Map<WorkoutDayDto>(workoutDay);
+        return Result<WorkoutDayDto>.Success(workoutDayDto);
+    }
+
     public async Task<Result<WorkoutDayDto>> CreateWorkoutDay(Guid workoutPlanId, CreateWorkoutDayDto createDayDto)
     {
         var workoutDay = _mapper.Map<WorkoutDay>(createDayDto);
