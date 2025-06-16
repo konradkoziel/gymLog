@@ -15,7 +15,7 @@ public class WorkoutPlanService(AppDbContext context, IMapper mapper) : IWorkout
     
     public async Task<Result<IEnumerable<PlanDto>>> GetAllWorkoutPlans(Guid userId)
     {
-        var workoutPlans = await _context.WorkoutPlansPlans.Where(wp => wp.UserId == userId).ToListAsync();
+        var workoutPlans = await _context.WorkoutPlans.Where(wp => wp.UserId == userId).ToListAsync();
         if (workoutPlans.Count != 0) Result<List<WorkoutPlan>>.Failure("Not found");
         var workoutPlansDto = _mapper.Map<List<PlanDto>>(workoutPlans);
         return Result<IEnumerable<PlanDto>>.Success(workoutPlansDto);
@@ -32,13 +32,13 @@ public class WorkoutPlanService(AppDbContext context, IMapper mapper) : IWorkout
 
     public async Task<Result<PlanDto>> UpdateWorkoutPlan(Guid workoutPlanId, Guid userId, CreatePlanDto createPlanDto)
     {
-        var workoutPlan = await _context.WorkoutPlansPlans.FindAsync(workoutPlanId);
+        var workoutPlan = await _context.WorkoutPlans.FindAsync(workoutPlanId);
         
         if (workoutPlan == null) return Result<PlanDto>.Failure("Not found");
         if (workoutPlan.UserId != userId) return Result<PlanDto>.Failure("Permission denied");
         
         _mapper.Map(createPlanDto, workoutPlan);
-        _context.WorkoutPlansPlans.Update(workoutPlan);
+        _context.WorkoutPlans.Update(workoutPlan);
         await _context.SaveChangesAsync();
         
         return Result<PlanDto>.Success(_mapper.Map<PlanDto>(workoutPlan));
@@ -46,12 +46,12 @@ public class WorkoutPlanService(AppDbContext context, IMapper mapper) : IWorkout
 
     public async Task<Result<bool>> RemoveWorkoutPlan(Guid workoutId, Guid userId)
     {
-        var workoutPlan = await _context.WorkoutPlansPlans.FindAsync(workoutId);
+        var workoutPlan = await _context.WorkoutPlans.FindAsync(workoutId);
         
         if (workoutPlan == null) return Result<bool>.Failure("Not found");
         if (workoutPlan.UserId != userId) return Result<bool>.Failure("Permission denied");
         
-        _context.WorkoutPlansPlans.Remove(workoutPlan);
+        _context.WorkoutPlans.Remove(workoutPlan);
         await _context.SaveChangesAsync();
         
         return Result<bool>.Success(true);

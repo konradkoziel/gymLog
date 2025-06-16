@@ -8,7 +8,7 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) {}
 
     public DbSet<User> Users => Set<User>();
-    public DbSet<WorkoutPlan> WorkoutPlansPlans => Set<WorkoutPlan>();
+    public DbSet<WorkoutPlan> WorkoutPlans => Set<WorkoutPlan>();
     public DbSet<WorkoutDay> WorkoutDays => Set<WorkoutDay>();
     public DbSet<Exercise> Exercises => Set<Exercise>();
     public DbSet<ExerciseProgress> ExerciseProgress => Set<ExerciseProgress>();
