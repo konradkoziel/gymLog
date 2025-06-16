@@ -1,49 +1,46 @@
-﻿using gymLog.API.Exceptions;
-using gymLog.API.Services.interfaces;
-using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
-using System.Net;
+﻿using System.ComponentModel.DataAnnotations;
+using gymLog.API.Exceptions;
+using gymLog.API.Services.Interfaces;
 
-namespace gymLog.API.Middleware
+namespace gymLog.API.Middleware;
+
+public class ExceptionHandlingMiddleware
 {
-    public class ExceptionHandlingMiddleware
+    private readonly ILogService _log;
+    private readonly RequestDelegate _next;
+
+    public ExceptionHandlingMiddleware(RequestDelegate next, ILogService log)
     {
-        private readonly RequestDelegate _next;
-        private readonly ILogService _log;
+        _next = next;
+        _log = log;
+    }
 
-        public ExceptionHandlingMiddleware(RequestDelegate next, ILogService log)
+    public async Task InvokeAsync(HttpContext context)
+    {
+        try
         {
-            _next = next;
-            _log = log;
+            await _next(context);
         }
-
-        public async Task InvokeAsync(HttpContext context)
+        catch (Exception ex)
         {
-            try
+            _log.LogError(ex, "Unhandled exception");
+
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = ex switch
             {
-                await _next(context);
-            }
-            catch (Exception ex)
+                NotFoundException => StatusCodes.Status404NotFound,
+                ValidationException => StatusCodes.Status400BadRequest,
+                UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
+                _ => StatusCodes.Status500InternalServerError
+            };
+
+            var errorResponse = new
             {
-                _log.LogError(ex, "Unhandled exception");
+                error = ex.Message,
+                status = context.Response.StatusCode
+            };
 
-                context.Response.ContentType = "application/json";
-                context.Response.StatusCode = ex switch
-                {
-                    NotFoundException => StatusCodes.Status404NotFound,
-                    ValidationException => StatusCodes.Status400BadRequest,
-                    UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
-                    _ => StatusCodes.Status500InternalServerError
-                };
-
-                var errorResponse = new
-                {
-                    error = ex.Message,
-                    status = context.Response.StatusCode
-                };
-
-                await context.Response.WriteAsJsonAsync(errorResponse);
-            }
+            await context.Response.WriteAsJsonAsync(errorResponse);
         }
     }
 }

@@ -1,6 +1,6 @@
 using gymLog.API.Middleware;
 using gymLog.API.Services;
-using gymLog.API.Services.interfaces;
+using gymLog.API.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
