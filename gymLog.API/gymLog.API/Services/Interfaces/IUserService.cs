@@ -1,9 +1,8 @@
 ﻿using gymLog.API.Model;
-using gymLog.Model;
 
-namespace gymLog.API.Services.interfaces
+namespace gymLog.API.Services.Interfaces
 {
-    public interface IUserService : IBasicCrudService<User>
+    public interface IUserService
     {
         Task<User> AuthenticateAsync(string email, string password);
     }

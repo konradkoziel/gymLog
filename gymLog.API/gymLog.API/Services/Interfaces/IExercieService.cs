@@ -1,7 +1,7 @@
 ﻿using gymLog.API.Model.DTO;
 using gymLog.API.Model.DTO.ExerciseDto;
 
-namespace gymLog.API.Services.interfaces
+namespace gymLog.API.Services.Interfaces
 {
     public interface IExerciseService
     {
