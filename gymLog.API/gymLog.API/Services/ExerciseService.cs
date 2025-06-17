@@ -22,7 +22,7 @@ public class ExerciseService : IExerciseService
     public async Task<Result<IEnumerable<ExerciseDto>>> GetAllExercises(Guid workoutDayId)
     {
         var exercises = await _context.Exercises.Where(e => e.WorkoutDayId == workoutDayId).ToListAsync();
-        if (exercises.Count != 0) Result<List<ExerciseDto>>.Failure("Not found");
+        if (exercises.Count == 0) return Result<IEnumerable<ExerciseDto>>.Failure("Not found");
         var execricesDto = _mapper.Map<List<ExerciseDto>>(exercises);
         return Result<IEnumerable<ExerciseDto>>.Success(execricesDto);
     }

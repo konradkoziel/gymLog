@@ -16,7 +16,7 @@ public class WorkoutDayService(AppDbContext context, IMapper mapper) : IWorkoutD
     public async Task<Result<IEnumerable<WorkoutDayDto>>> GetAllWorkoutDays(Guid workoutPlanId)
     {
         var workoutDays = await _context.WorkoutDays.Where(wd => wd.WorkoutPlanId == workoutPlanId).ToListAsync();
-        if (workoutDays.Count != 0) Result<List<WorkoutDay>>.Failure("Not found");
+        if (workoutDays.Count == 0) return Result<IEnumerable<WorkoutDayDto>>.Failure("Not found");
         var workoutDaysDto = _mapper.Map<List<WorkoutDayDto>>(workoutDays);
         return Result<IEnumerable<WorkoutDayDto>>.Success(workoutDaysDto);
     }
