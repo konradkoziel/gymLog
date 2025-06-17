@@ -81,10 +81,10 @@ stages:
                   rootFolderOrFile: '$(Pipeline.Workspace)/drop)'
                   includeRootFolder: false
                   archiveType: 'zip'
-                  archiveFile: '$(Pipeline.Workspace)/drop)/app.zip'
+                  archiveFile: '$(Pipeline.Workspace)/drop/app.zip'
                   replaceExistingArchive: true
 
-              - publish: $(Pipeline.Workspace)/drop)/app.zip
+              - publish: $(Pipeline.Workspace)/drop/app.zip
                 artifact: drop
                 displayName: 'Publish ZIP artifact'
 
@@ -94,5 +94,5 @@ stages:
                   azureSubscription: 'Subskrypcja platformy Azure 1(932e1d67-df84-4d48-b484-8e29be5f1a82)'
                   appType: 'webAppLinux'
                   WebAppName: 'gymlog'
-                  packageForLinux: '$(Pipeline.Workspace)/drop)/app.zip'
+                  packageForLinux: '$(Pipeline.Workspace)/drop/app.zip'
                   DeploymentTypeLinux: 'oneDeploy'
