@@ -1,15 +1,15 @@
 trigger:
   branches:
     include:
-      - master
       - develop
+      - master
   paths:
     include:
       - gymLog.API/**
 pr:
   branches:
     include:
-      - develop
+      - '*'
 
 pool:
   vmImage: ubuntu-latest
