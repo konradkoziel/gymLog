@@ -23,6 +23,7 @@ builder.Services.AddScoped<IWorkoutPlanService, WorkoutPlanService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddSingleton<ILogService, LogService>();
 
+
 // Add JWT authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]);

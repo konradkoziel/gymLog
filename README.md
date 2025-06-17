@@ -6,4 +6,4 @@ Gymlog is a web application that allows users to create and manage their own wor
 
 * User registration and login
 * Add, edit, and delete personal workout plans
-* Progress tracking mechanism
+* Progress tracking mechanism for users
