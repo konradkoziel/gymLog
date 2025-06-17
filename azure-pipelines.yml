@@ -1,0 +1,98 @@
+trigger:
+  branches:
+    include:
+      - master
+      - develop
+  paths:
+    include:
+      - gymLog.API/**
+pr:
+  branches:
+    include:
+      - '*'
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  buildConfiguration: 'Release'
+  solutionPath: 'gymLog.API/'
+
+
+stages:
+  - stage: Build
+    jobs:
+      - job: Analyze
+        steps:
+
+        - checkout: self
+          displayName: 'Git clone'
+        - task: SonarCloudPrepare@3
+          displayName: Prepare SonarCloud
+          inputs:
+            SonarQube: 'gymLog'
+            organization: 'konrad981204'
+            scannerMode: 'dotnet'
+            projectKey: 'konrad981204_GymLog'
+            projectName: 'GymLog'
+
+        - script: dotnet build $(solutionPath) --configuration $(buildConfiguration)
+          displayName: 'Build app'
+
+        - task: SonarCloudAnalyze@3
+          displayName: Analyze SonarCloud
+          inputs:
+            jdkversion: 'JAVA_HOME_17_X64'
+
+        - task: SonarCloudPublish@3
+          displayName: Publish SonarCloud
+          inputs:
+            pollingTimeoutSec: '300'
+
+      - job: Test
+        steps:
+        - script: dotnet test $(solutionPath) --configuration $(buildConfiguration) --no-build
+          displayName: 'Run tests'
+
+      - job: Publish
+        steps:
+        - script: dotnet publish $(solutionPath) -c Release -o $(Build.ArtifactStagingDirectory)
+          displayName: 'Publish app'
+
+        - publish: $(Build.ArtifactStagingDirectory)
+          artifact: drop
+          displayName: 'Publish artifact'
+
+  - stage: Deploy
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+    jobs:
+      - deployment: production
+        environment: production
+        strategy:
+         runOnce:
+           deploy:
+             steps:
+              - download: current
+                artifact: drop
+
+              - task: ArchiveFiles@2
+                displayName: 'Pack to ZIP'
+                inputs:
+                  rootFolderOrFile: '$(Pipeline.Workspace)/drop)'
+                  includeRootFolder: false
+                  archiveType: 'zip'
+                  archiveFile: '$(Pipeline.Workspace)/drop)/app.zip'
+                  replaceExistingArchive: true
+
+              - publish: $(Pipeline.Workspace)/drop)/app.zip
+                artifact: drop
+                displayName: 'Publish ZIP artifact'
+
+              - task: AzureRmWebAppDeployment@5
+                inputs:
+                  ConnectionType: 'AzureRM'
+                  azureSubscription: 'Subskrypcja platformy Azure 1(932e1d67-df84-4d48-b484-8e29be5f1a82)'
+                  appType: 'webAppLinux'
+                  WebAppName: 'gymlog'
+                  packageForLinux: '$(Pipeline.Workspace)/drop)/app.zip'
+                  DeploymentTypeLinux: 'oneDeploy'
