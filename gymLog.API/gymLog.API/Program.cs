@@ -9,6 +9,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 // Add services to the container.
 // This is where you can configure services for dependency injection, logging, etc.
 builder.Services.AddControllers();
@@ -22,7 +23,6 @@ builder.Services.AddScoped<IWorkoutDayService, WorkoutDayService>();
 builder.Services.AddScoped<IWorkoutPlanService, WorkoutPlanService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddSingleton<ILogService, LogService>();
-
 
 // Add JWT authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");
