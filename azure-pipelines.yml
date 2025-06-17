@@ -35,6 +35,10 @@ stages:
             scannerMode: 'dotnet'
             projectKey: 'konrad981204_GymLog'
             projectName: 'GymLog'
+            extraProperties: |
+              sonar.pullrequest.key=$(System.PullRequest.PullRequestId)
+              sonar.pullrequest.branch=$(System.PullRequest.SourceBranch)
+              sonar.pullrequest.base=$(System.PullRequest.TargetBranch)
 
         - script: dotnet build $(solutionPath) --configuration $(buildConfiguration)
           displayName: 'Build app'
