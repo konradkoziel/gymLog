@@ -55,6 +55,9 @@ stages:
           displayName: 'Run tests'
 
       - job: Publish
+        dependsOn:
+        - Analyze
+        - Test
         steps:
         - script: dotnet publish $(solutionPath) -c Release -o $(Build.ArtifactStagingDirectory)
           displayName: 'Publish app'
