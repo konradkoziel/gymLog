@@ -40,7 +40,7 @@ stages:
               sonar.pullrequest.key=$(System.PullRequest.PullRequestNumber)
               sonar.pullrequest.branch=$(System.PullRequest.SourceBranch)
               sonar.pullrequest.base=$(System.PullRequest.TargetBranch)
-
+              sonar.branch.name=
         - task: SonarCloudPrepare@3
           displayName: Prepare SonarCloud (Branch)
           condition: or(eq(variables['System.PullRequest.PullRequestNumber'], ''), ne(variables['Build.Reason'], 'PullRequest'))
