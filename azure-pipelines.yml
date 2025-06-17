@@ -28,7 +28,8 @@ stages:
         - checkout: self
           displayName: 'Git clone'
         - task: SonarCloudPrepare@3
-          displayName: Prepare SonarCloud
+          displayName: Prepare SonarCloud (Pull Request)
+          condition: and(succeeded(), ne(variables['System.PullRequest.PullRequestNumber'], ''))
           inputs:
             SonarQube: 'gymLog'
             organization: 'konrad981204'
@@ -39,6 +40,17 @@ stages:
               sonar.pullrequest.key=$(System.PullRequest.PullRequestNumber)
               sonar.pullrequest.branch=$(System.PullRequest.SourceBranch)
               sonar.pullrequest.base=$(System.PullRequest.TargetBranch)
+
+        - task: SonarCloudPrepare@3
+          displayName: Prepare SonarCloud (Branch)
+          condition: or(eq(variables['System.PullRequest.PullRequestNumber'], ''), ne(variables['Build.Reason'], 'PullRequest'))
+          inputs:
+            SonarQube: 'gymLog'
+            organization: 'konrad981204'
+            scannerMode: 'dotnet'
+            projectKey: 'konrad981204_GymLog'
+            projectName: 'GymLog'
+
 
         - script: dotnet build $(solutionPath) --configuration $(buildConfiguration)
           displayName: 'Build app'
