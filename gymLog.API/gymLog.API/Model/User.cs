@@ -1,4 +1,6 @@
-﻿namespace gymLog.Model
+﻿using gymLog.API.Model;
+
+namespace gymLog.Model
 {
     public class User
     {
@@ -11,6 +13,6 @@
         public decimal Height { get; set; }
         public DateTime CreatedAt { get; set; }
         public ICollection<WorkoutPlan> WorkoutPlans { get; set; }
-
+        public ICollection<RefreshToken> RefreshTokens { get; set; }
     }
 }
