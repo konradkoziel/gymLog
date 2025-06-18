@@ -1,4 +1,5 @@
-﻿using gymLog.Model;
+﻿using gymLog.API.Model;
+using gymLog.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace gymLog.Entity
@@ -13,6 +14,14 @@ namespace gymLog.Entity
                 us.Property(x => x.Name).HasColumnType("varchar(100)");
                 us.Property(x => x.Weight).HasColumnType("decimal(18,2)");
                 us.Property(x => x.Height).HasColumnType("decimal(18,2)");
+            });
+
+            modelBuilder.Entity<RefreshToken>(rt => {
+                rt.HasKey(x => x.Id);
+                rt.Property(x => x.Token).HasColumnType("varchar(88)");
+                rt.HasOne(x => x.User)
+                    .WithMany(x => x.RefreshTokens)
+                    .HasForeignKey(x => x.UserId);
             });
 
             modelBuilder.Entity<Exercise>(ex =>
@@ -58,5 +67,6 @@ namespace gymLog.Entity
         public DbSet<Exercise> Exercises { get; set; }
         public DbSet<WorkoutPlan> WorkoutPlans { get; set; }
         public DbSet<WorkoutDay> WorkoutDays { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
     }
 }
