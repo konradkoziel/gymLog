@@ -18,11 +18,19 @@ public class AppDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<User>()
-            .HasMany(u => u.Plans)
+            .HasMany(u => u.WorkoutPlans)
             .WithOne(p => p.User)
             .HasForeignKey(p => p.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        modelBuilder.Entity<RefreshToken>(rt => {
+            rt.HasKey(x => x.Id);
+            rt.Property(x => x.Token).HasColumnType("varchar(88)");
+            rt.HasOne(x => x.User)
+                .WithMany(x => x.RefreshTokens)
+                .HasForeignKey(x => x.UserId);
+        });
+        
         modelBuilder.Entity<WorkoutPlan>()
             .HasMany(p => p.Days)
             .WithOne(d => d.WorkoutPlan)

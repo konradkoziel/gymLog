@@ -1,7 +1,6 @@
 ﻿namespace gymLog.API.Model;
 
-public class Exercise
-{
+public class Exercise {
     public Guid Id { get; set; }
     public Guid WorkoutDayId { get; set; }
     public WorkoutDay WorkoutDay { get; set; } = null!;

@@ -1,5 +1,4 @@
 ﻿using gymLog.API.Model.DTO;
-using gymLog.API.Model.DTO.WorkoutDayDto;
 
 namespace gymLog.API.Services.Interfaces;
 

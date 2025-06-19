@@ -1,7 +1,7 @@
-﻿namespace gymLog.API.Model;
+﻿
+namespace gymLog.API.Model;
 
-public class WorkoutPlan
-{
+public class WorkoutPlan {
     public Guid Id { get; set; }
     public Guid UserId { get; set; }
     public User User { get; set; } = null!;
