@@ -9,7 +9,6 @@ namespace gymLog.API.Mappings
         public UserProfile() 
         {
             CreateMap<User, UserDto>();
-            CreateMap<UserDto, User>();
         }
     }
 }

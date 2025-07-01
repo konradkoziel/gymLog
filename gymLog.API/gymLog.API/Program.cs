@@ -1,18 +1,15 @@
 using gymLog.API.Middleware;
 using gymLog.API.Services;
 using gymLog.API.Services.Interfaces;
+using gymLog.Entity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using gymLog.API.Entity;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// This is where you can configure services for dependency injection, logging, etc.
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>
@@ -21,12 +18,11 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<IExerciseService, ExerciseService>();
 builder.Services.AddScoped<IWorkoutDayService, WorkoutDayService>();
 builder.Services.AddScoped<IWorkoutPlanService, WorkoutPlanService>();
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICookieService, CookieService>();
+builder.Services.AddScoped<IClaimsService, ClaimsService>();
 builder.Services.AddSingleton<ILogService, LogService>();
-
-// Add JWT authentication
-var jwtSettings = builder.Configuration.GetSection("Jwt");
-var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]);
 
 builder.Services.AddAuthentication(options =>
 {
@@ -35,17 +31,23 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
+    options.RequireHttpsMetadata = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidAudience = jwtSettings["Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(key)
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]
+                ?? throw new InvalidOperationException("JWT key is missing.")))
     };
 });
+
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
@@ -54,8 +56,10 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
+

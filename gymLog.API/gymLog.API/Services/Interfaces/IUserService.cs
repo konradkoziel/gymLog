@@ -1,9 +1,10 @@
-﻿using gymLog.API.Model;
+﻿using gymLog.API.Model.DTO;
+using gymLog.API.Model.DTO.UserDto;
 
 namespace gymLog.API.Services.Interfaces
 {
-    public interface IUserService
+    public interface IUserService 
     {
-        Task<User> AuthenticateAsync(string email, string password);
+        Task<Result<UserDto>> GetCurrentUser(Guid userId);
     }
 }

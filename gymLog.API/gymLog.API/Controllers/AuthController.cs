@@ -1,79 +1,85 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using gymLog.API.Model;
-using gymLog.API.Model.DTO.AuthDto;
+﻿using gymLog.API.Model.DTO.AuthDto;
+using gymLog.API.Model.DTO.TokenDto;
+using gymLog.API.Services;
 using gymLog.API.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
-namespace gymLog.API.Controllers;
-
-[Route("api/[controller]")]
-[ApiController]
-public class AuthController : ControllerBase
+namespace gymLog.API.Controllers
 {
-    private readonly IConfiguration _configuration;
-    private readonly IUserService _userService;
-
-    public AuthController(IUserService userService, IConfiguration configuration)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class AuthController : ControllerBase
     {
-        _userService = userService;
-        _configuration = configuration;
-    }
+        private readonly IAuthService _authService;
+        private readonly ICookieService _cookieService;
+        private readonly IClaimsService _claimsService;
 
-    [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] Login loginModel)
-    {
-        var user = await _userService.AuthenticateAsync(loginModel.Email, loginModel.PasswordHash);
-        if (user == null) return Unauthorized();
-
-        var token = GenerateJwtToken(user);
-        return Ok(new { token });
-    }
-
-    [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
-    {
-        var user = new User
+        public AuthController(IAuthService authService, ICookieService cookieService, IClaimsService claimsService)
         {
-            Id = Guid.NewGuid(),
-            Name = registerDto.Name,
-            Email = registerDto.Email,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
-            DateOfBirth = registerDto.DateOfBirth,
-            Weight = registerDto.Weight,
-            Height = registerDto.Height,
-            CreatedAt = DateTime.UtcNow
-        };
+            _authService = authService;
+            _cookieService = cookieService;
+            _claimsService = claimsService;
+        }
 
-        var result = await _userService.CreateAsync(user);
-        if (result.IsSuccess) return CreatedAtAction(nameof(Login), new { email = result.Data!.Email }, result.Data);
-
-        return BadRequest(result);
-    }
-
-    private string GenerateJwtToken(User user)
-    {
-        var jwtSettings = _configuration.GetSection("Jwt");
-        var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]);
-
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var tokenDescriptor = new SecurityTokenDescriptor
+        [HttpPost("login")]
+        public async Task<ActionResult<AuthDto>> Login(LoginDto loginDto)
         {
-            Subject = new ClaimsIdentity(new[]
+            var result = await _authService.Login(loginDto);
+            if (result.IsSuccess)
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email)
-            }),
-            Expires = DateTime.UtcNow.AddMinutes(double.Parse(jwtSettings["ExpireMinutes"])),
-            SigningCredentials =
-                new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
-            Issuer = jwtSettings["Issuer"],
-            Audience = jwtSettings["Audience"]
-        };
+                _cookieService.SetCookies(Response, result.Data!);
+                return Ok(result.Data);
+            }
+            return BadRequest(result.Message);
+        }
 
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
+        [HttpPost("register")]
+        public async Task<ActionResult<AuthDto>> Register(RegisterDto registerDto)
+        {
+            var result = await _authService.Register(registerDto);
+            if (result.IsSuccess)
+            {
+                return Ok(result.Data);
+            }
+            return BadRequest(result.Message);
+        }
+
+        [HttpPost("refresh")]
+        public async Task<ActionResult<AuthDto>> Refresh(TokenDto tokenDto)
+        {
+            var result = await _authService.RefreshToken(tokenDto);
+            if (result.IsSuccess)
+            {
+                return Ok(result.Data);
+            }
+            return BadRequest(result.Message);
+        }
+
+        [Authorize]
+        [HttpPost("revoke")]
+        public async Task<IActionResult> Revoke()
+        {
+            var result = await _authService.RevokeToken(_claimsService.GetUserEmailFromClaims(User).Data!);
+            if (result.IsSuccess)
+            {
+                return Ok(result.Data);
+            }
+            return BadRequest(result.Message);
+        }
+
+        [Authorize]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            var result = await _authService.RevokeToken(_claimsService.GetUserEmailFromClaims(User).Data!);
+            if (result.IsSuccess)
+            {
+                _cookieService.ClearCookies(Response);
+                return Ok(result.Data);
+            }
+            return BadRequest(result.Message);
+        }
     }
 }

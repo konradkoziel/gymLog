@@ -1,18 +1,36 @@
-﻿using gymLog.API.Entity;
-using gymLog.API.Model;
-using gymLog.API.Services.Interfaces;
+﻿using AutoMapper;
+using gymLog.Entity;
+using gymLog.API.Model.DTO;
+using gymLog.API.Model.DTO.UserDto;
 using Microsoft.EntityFrameworkCore;
 
-namespace gymLog.API.Services;
-
-public class UserService(AppDbContext context) : IUserService
+namespace gymLog.API.Services
 {
-    private readonly AppDbContext _context = context;
-
-    public async Task<User> AuthenticateAsync(string email, string password)
+    public class UserService
     {
-        var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
-        if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash)) return null;
-        return user;
+        private readonly IMapper _mapper;
+        private readonly AppDbContext _context;
+
+        public UserService(IMapper mapper, AppDbContext context)
+        {
+            _mapper = mapper;
+            _context = context;
+        }
+        public async Task<Result<UserDto>> GetCurrentUser(Guid userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return Result<UserDto>.Failure("Not found");
+            }
+            return Result<UserDto>.Success(_mapper.Map<UserDto>(user));
+        }
     }
 }
+
+
+
+
+
+
+
