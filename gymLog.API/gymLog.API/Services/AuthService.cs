@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
-using gymLog.Entity;
+using gymLog.API.Entity;
 using gymLog.API.Model;
 using gymLog.API.Model.DTO;
 using gymLog.API.Model.DTO.AuthDto;
 using gymLog.API.Model.DTO.TokenDto;
 using gymLog.API.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace gymLog.API.Services
 {
@@ -14,12 +16,14 @@ namespace gymLog.API.Services
         private readonly IMapper _mapper;
         private readonly AppDbContext _context;
         private readonly ITokenService _tokenService;
+        private readonly IClaimsService _claimsService;
 
-        public AuthService(IMapper mapper, AppDbContext context, ITokenService tokenService)
+        public AuthService(IMapper mapper, AppDbContext context, ITokenService tokenService, IClaimsService claimsService)
         {
             _mapper = mapper;
             _context = context;
             _tokenService = tokenService;
+            _claimsService = claimsService;
         }
 
         public async Task<Result<AuthDto>> Login(LoginDto loginDto)
@@ -44,9 +48,9 @@ namespace gymLog.API.Services
             await _context.SaveChangesAsync();
             var authDto = _mapper.Map<AuthDto>(user);
             authDto.AccessToken = accessToken.Token;
-            authDto.AccessTokenExpires = accessToken.TokenExpires;
+            authDto.AccessTokenExpiresAt = accessToken.TokenExpires;
             authDto.RefreshToken = refreshToken.Token;
-            authDto.RefreshTokenExpires = refreshToken.TokenExpires;
+            authDto.RefreshTokenExpiresAt = refreshToken.TokenExpires;
             return Result<AuthDto>.Success(authDto);
         }
         public async Task<Result<AuthDto>> Register(RegisterDto registerDto)
@@ -66,9 +70,9 @@ namespace gymLog.API.Services
         }
         public async Task<Result<AuthDto>> RefreshToken(TokenDto tokenDto)
         {
-            var principal = await _tokenService.GetClaimsPrincipalFromExpiredToken(tokenDto.AccessToken);
-            var email = principal.Identity?.Name;
-            var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
+            var principal = await _tokenService.GetClaimsPrincipalFromExpiredToken(tokenDto.AccessToken ?? "");
+            var email = _claimsService.GetUserEmailFromClaims(principal);
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == email.Data);
             var refreshToken = await _context.RefreshTokens.SingleOrDefaultAsync(rt => rt.Token == tokenDto.RefreshToken);
             if (email == null || user == null || refreshToken == null || refreshToken.UserId != user.Id || refreshToken.IsRevoked || refreshToken.IsUsed || refreshToken.ExpiresAt <= DateTime.UtcNow)
             {
@@ -90,9 +94,9 @@ namespace gymLog.API.Services
             await _context.SaveChangesAsync();
             var authDto = _mapper.Map<AuthDto>(user);
             authDto.AccessToken = newAccessToken.Token;
-            authDto.AccessTokenExpires = newAccessToken.TokenExpires;
+            authDto.AccessTokenExpiresAt = newAccessToken.TokenExpires;
             authDto.RefreshToken = newRefreshToken.Token;
-            authDto.RefreshTokenExpires = newRefreshToken.TokenExpires;
+            authDto.RefreshTokenExpiresAt = newRefreshToken.TokenExpires;
             return Result<AuthDto>.Success(authDto);
         }
         public async Task<Result<bool>> RevokeToken(string email)

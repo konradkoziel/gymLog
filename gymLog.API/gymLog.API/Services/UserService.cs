@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using gymLog.Entity;
+using gymLog.API.Entity;
 using gymLog.API.Model.DTO;
 using gymLog.API.Model.DTO.UserDto;
 using Microsoft.EntityFrameworkCore;

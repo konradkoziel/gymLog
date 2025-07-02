@@ -12,7 +12,7 @@ namespace gymLog.API.Services
     {
         public (string Token, DateTime TokenExpires) GenerateAccessToken(User user)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT key is missing."))); // NOSONAR
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT key is missing.")));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var expires = DateTime.UtcNow.AddMinutes(double.Parse(configuration["Jwt:ExpireMinutes"] ?? throw new InvalidOperationException("JWT ExpireMinutes is missing.")));
 
@@ -21,7 +21,6 @@ namespace gymLog.API.Services
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Name, user.Email ?? "")
             };
 
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -49,7 +48,7 @@ namespace gymLog.API.Services
         }
         public async Task<ClaimsPrincipal> GetClaimsPrincipalFromExpiredToken(string token)
         {
-            var key = Encoding.UTF8.GetBytes(configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT key is missing.")); // NOSONAR
+            var key = Encoding.UTF8.GetBytes(configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT key is missing."));
             var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
@@ -70,6 +69,5 @@ namespace gymLog.API.Services
 
             return new ClaimsPrincipal(validationResult.ClaimsIdentity);
         }
-
     }
 }

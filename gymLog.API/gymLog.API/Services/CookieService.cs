@@ -3,26 +3,22 @@ using gymLog.API.Services.Interfaces;
 
 namespace gymLog.API.Services
 {
-    public class CookieService: ICookieService
+    public class CookieService : ICookieService
     {
+        private CookieOptions GetBaseOptions(DateTimeOffset expiresAt) => new()
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = expiresAt
+        };
+
         public void SetCookies(HttpResponse response, AuthDto authDto)
         {
-            response.Cookies.Append("accessToken", authDto.AccessToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = authDto.AccessTokenExpires
-            });
-
-            response.Cookies.Append("refreshToken", authDto.RefreshToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = authDto.RefreshTokenExpires
-            });
+            response.Cookies.Append("accessToken", authDto.AccessToken, GetBaseOptions(authDto.AccessTokenExpiresAt));
+            response.Cookies.Append("refreshToken", authDto.RefreshToken, GetBaseOptions(authDto.RefreshTokenExpiresAt));
         }
+
         public void ClearCookies(HttpResponse response)
         {
             response.Cookies.Delete("accessToken");
@@ -30,4 +26,3 @@ namespace gymLog.API.Services
         }
     }
 }
-

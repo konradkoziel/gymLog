@@ -1,9 +1,7 @@
 ﻿using gymLog.API.Model.DTO.AuthDto;
 using gymLog.API.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace gymLog.API.Controllers;
 
@@ -12,17 +10,19 @@ namespace gymLog.API.Controllers;
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
+    private readonly IClaimsService _claimsService;
 
-    public UserController(IUserService userService)
+    public UserController(IUserService userService, IClaimsService claimsService)
     {
         _userService = userService;
+        _claimsService = claimsService;
     }
 
     [Authorize]
     [HttpGet]
     public async Task<ActionResult<AuthDto>> GetCurrentUser()
     {
-        var result = await _userService.GetCurrentUser(Guid.Parse(User.FindFirstValue(JwtRegisteredClaimNames.Sub)!));
+        var result = await _userService.GetCurrentUser(_claimsService.GetUserIdFromClaims(User).Data);
         if (result.IsSuccess)
         {
             return Ok(result.Data);
