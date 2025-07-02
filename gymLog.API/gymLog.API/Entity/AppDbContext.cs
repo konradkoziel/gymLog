@@ -1,63 +1,62 @@
 ﻿using gymLog.API.Model;
-using gymLog.Model;
 using Microsoft.EntityFrameworkCore;
 
-namespace gymLog.Entity
+namespace gymLog.API.Entity
 {
     public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
     {
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>(us =>
+            modelBuilder.Entity<User>(u =>
             {
-                us.HasKey(x => x.Id);
-                us.Property(x => x.Name).HasColumnType("varchar(100)");
-                us.Property(x => x.Weight).HasColumnType("decimal(18,2)");
-                us.Property(x => x.Height).HasColumnType("decimal(18,2)");
+                u.HasKey(x => x.Id);
+                u.Property(x => x.Name).HasColumnType("varchar(100)");
+                u.Property(x => x.Weight).HasColumnType("decimal(18,2)");
+                u.Property(x => x.Height).HasColumnType("decimal(18,2)");
             });
 
-            modelBuilder.Entity<RefreshToken>(rt => {
+            modelBuilder.Entity<RefreshToken>(rt =>
+            {
                 rt.HasKey(x => x.Id);
                 rt.Property(x => x.Token).HasColumnType("varchar(88)");
                 rt.HasOne(x => x.User)
-                    .WithMany(x => x.RefreshTokens)
-                    .HasForeignKey(x => x.UserId);
+                  .WithMany(u => u.RefreshTokens)
+                  .HasForeignKey(x => x.UserId);
             });
 
             modelBuilder.Entity<Exercise>(ex =>
             {
                 ex.HasKey(x => x.Id);
                 ex.Property(x => x.Name).HasColumnType("varchar(100)");
-                ex.Property(x => x.Description).HasColumnType("varchar(500)");
-                ex.Property(x => x.Category).HasColumnType("varchar(100)");
+                ex.Property(x => x.LastMaxWeight).HasColumnType("decimal(18,2)");
                 ex.HasOne(x => x.WorkoutDay)
                   .WithMany(wd => wd.Exercises)
-                  .HasForeignKey("WorkoutDayId");
+                  .HasForeignKey(x => x.WorkoutDayId)
+                  .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<WorkoutPlan>(wp =>
             {
                 wp.HasKey(x => x.Id);
                 wp.Property(x => x.Name).HasColumnType("varchar(100)");
-                wp.Property(x => x.Description).HasColumnType("varchar(500)");
-                wp.HasMany(x => x.WorkoutDays)
-                  .WithOne()
-                  .HasForeignKey("WorkoutPlanId");
-                wp.HasOne(x => x.User)
+                wp.HasMany(wp => wp.Days)
+                  .WithOne(wd => wd.WorkoutPlan)
+                  .HasForeignKey(wd => wd.WorkoutPlanId);
+                wp.HasOne(wp => wp.User)
                   .WithMany(u => u.WorkoutPlans)
-                  .HasForeignKey("UserId");
+                  .HasForeignKey(wp => wp.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<WorkoutDay>(wd =>
             {
                 wd.HasKey(x => x.Id);
-                wd.Property(x => x.Description).HasColumnType("varchar(500)");
-                wd.HasOne(x => x.WorkoutPlan)
-                  .WithMany(wp => wp.WorkoutDays)
-                  .HasForeignKey("WorkoutPlanId");
-                wd.HasMany(x => x.Exercises)
-                  .WithOne(e => e.WorkoutDay)
-                  .HasForeignKey("WorkoutDayId");
+                wd.HasOne(wd => wd.WorkoutPlan)
+                  .WithMany(wp => wp.Days)
+                  .HasForeignKey(wd => wd.WorkoutPlanId);
+                wd.HasMany(wd => wd.Exercises)
+                  .WithOne(ex => ex.WorkoutDay)
+                  .HasForeignKey(ex => ex.WorkoutDayId);
             });
         }
 
