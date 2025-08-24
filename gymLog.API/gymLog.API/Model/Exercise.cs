@@ -1,12 +1,15 @@
-﻿namespace gymLog.Model
+﻿namespace gymLog.API.Model;
+
+public class Exercise
 {
-    public class Exercise
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string Category { get; set; }
-        public Guid WorkoutDayId { get; set; }
-        public WorkoutDay WorkoutDay { get; set; }
-    }
+    public Guid Id { get; set; }
+    public Guid WorkoutDayId { get; set; }
+    public WorkoutDay WorkoutDay { get; set; } = null!;
+
+    public string Name { get; set; } = string.Empty;
+    public int Reps { get; set; }
+    public decimal LastMaxWeight { get; set; }
+    public int Order { get; set; }
+
+    public List<ExerciseProgress> ProgressHistory { get; set; } = new();
 }

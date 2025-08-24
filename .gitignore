@@ -63,33 +63,3 @@ gymlog.UI/*.log
 
 # Temp files
 *.tmp
-/gymLog.API/gymLog.Tests/bin/Debug/net8.0/.msCoverageSourceRootsMapping_gymLog.Tests
-/gymLog.API/gymLog.API/obj/Debug/net8.0/.NETCoreApp,Version=v8.0.AssemblyAttributes.cs
-/gymLog.API/gymLog.Tests/obj/Debug/net8.0/.NETCoreApp,Version=v8.0.AssemblyAttributes.cs
-/gymLog.API/gymLog.Tests/bin/Debug/net8.0/CoverletSourceRootsMapping_gymLog.Tests
-/gymLog.API/gymLog.API/obj/Debug/net8.0/gymLog.API.AssemblyInfo.cs
-/gymLog.API/gymLog.API/obj/Debug/net8.0/gymLog.API.AssemblyInfoInputs.cache
-/gymLog.API/gymLog.API/obj/Debug/net8.0/gymLog.API.assets.cache
-/gymLog.API/gymLog.API/obj/Debug/net8.0/gymLog.API.csproj.AssemblyReference.cache
-/gymLog.API/gymLog.API/obj/gymLog.API.csproj.nuget.dgspec.json
-/gymLog.API/gymLog.API/obj/gymLog.API.csproj.nuget.g.props
-/gymLog.API/gymLog.API/obj/gymLog.API.csproj.nuget.g.targets
-/gymLog.API/gymLog.API/obj/Debug/net8.0/gymLog.API.GeneratedMSBuildEditorConfig.editorconfig
-/gymLog.API/gymLog.API/obj/Debug/net8.0/gymLog.API.GlobalUsings.g.cs
-/gymLog.API/gymLog.Tests/obj/Debug/net8.0/gymLog.Tests.AssemblyInfo.cs
-/gymLog.API/gymLog.Tests/obj/Debug/net8.0/gymLog.Tests.AssemblyInfoInputs.cache
-/gymLog.API/gymLog.Tests/obj/Debug/net8.0/gymLog.Tests.assets.cache
-/gymLog.API/gymLog.Tests/obj/Debug/net8.0/gymLog.Tests.csproj.AssemblyReference.cache
-/gymLog.API/gymLog.Tests/obj/gymLog.Tests.csproj.nuget.dgspec.json
-/gymLog.API/gymLog.Tests/obj/gymLog.Tests.csproj.nuget.g.props
-/gymLog.API/gymLog.Tests/obj/gymLog.Tests.csproj.nuget.g.targets
-/gymLog.API/gymLog.Tests/obj/Debug/net8.0/gymLog.Tests.GeneratedMSBuildEditorConfig.editorconfig
-/gymLog.API/gymLog.Tests/obj/Debug/net8.0/gymLog.Tests.GlobalUsings.g.cs
-/gymLog.API/gymLog.API/obj/project.assets.json
-/gymLog.API/gymLog.Tests/obj/project.assets.json
-/gymLog.API/gymLog.API/obj/project.nuget.cache
-/gymLog.API/gymLog.Tests/obj/project.nuget.cache
-/gymLog.API/gymLog.API/obj/project.packagespec.json
-/gymLog.API/gymLog.Tests/obj/project.packagespec.json
-/gymLog.API/gymLog.API/obj/rider.project.restore.info
-/gymLog.API/gymLog.Tests/obj/rider.project.restore.info

@@ -1,39 +1,59 @@
-﻿using gymLog.API.Model.DTO;
-using gymLog.API.Services.interfaces;
-using gymLog.Entity;
-using gymLog.Model;
+﻿using AutoMapper;
+using gymLog.API.Entity;
+using gymLog.API.Model;
+using gymLog.API.Model.DTO;
+using gymLog.API.Model.DTO.ExerciseDto;
+using gymLog.API.Services.Interfaces;
+using gymLog.API.Validators;
+using Microsoft.EntityFrameworkCore;
 
-namespace gymLog.API.Services
+namespace gymLog.API.Services;
+
+public class ExerciseService : IExerciseService
 {
-    public class ExerciseService(AppDbContext context) : BasicCrudService<Exercise>(context), IExerciseService
-    {
-        public override async Task<Result<Exercise>> CreateAsync(Exercise exercise) {
-            if (string.IsNullOrEmpty(exercise.Name))
-                return Result<Exercise>.Failure("Exercise has no name", null);
-            
-            if (exercise.WorkoutDay == null)
-                return Result<Exercise>.Failure("Exercise has no workout day", null);
-            
-            if (exercise.Category == null)
-                return Result<Exercise>.Failure("Exercise has no category", null);
-            
-            return await base.CreateAsync(exercise);
-        }
+    private readonly AppDbContext _context;
+    private readonly IMapper _mapper;
 
-        public override async Task<Result<Exercise?>> UpdateAsync(Exercise exercise) {
-            if (GetByIdAsync(exercise.Id).Result.Data == null)
-                return Result<Exercise?>.Failure("Exercise does not exist", null);
-            
-            if (string.IsNullOrEmpty(exercise.Name))
-                return Result<Exercise?>.Failure("Exercise has no name", null);
-            
-            if (exercise.WorkoutDay == null)
-                return Result<Exercise?>.Failure("Exercise has no workout day", null);
-            
-            if (exercise.Category == null)
-                return Result<Exercise?>.Failure("Exercise has no category", null);
-            
-            return await base.UpdateAsync(exercise);
-        }
+    public ExerciseService(AppDbContext context, IMapper mapper, ILogService logService)
+    {
+        _mapper = mapper;
+        _context = context;
+    }
+
+    public async Task<Result<IEnumerable<ExerciseDto>>> GetAllExercises(Guid workoutDayId)
+    {
+        var exercises = await _context.Exercises.Where(e => e.WorkoutDayId == workoutDayId).ToListAsync();
+        if (exercises.Count == 0) return Result<IEnumerable<ExerciseDto>>.Failure("Not found");
+        var execricesDto = _mapper.Map<List<ExerciseDto>>(exercises);
+        return Result<IEnumerable<ExerciseDto>>.Success(execricesDto);
+    }
+
+    public async Task<Result<ExerciseDto>> CreateExercise(CreateExerciseDto createExerciseDto)
+    {
+        var validator = new ExerciseValidator();
+        validator.Validate(createExerciseDto);
+        var exercise = _mapper.Map<Exercise>(createExerciseDto);
+        _context.Add((object)exercise);
+        await _context.SaveChangesAsync();
+        return Result<ExerciseDto>.Success(_mapper.Map<ExerciseDto>(exercise));
+    }
+
+    public async Task<Result<ExerciseDto>> UpdateExercise(Guid exerciseId, CreateExerciseDto createExerciseDto)
+    {
+        var exercise = await _context.Exercises.FindAsync(exerciseId);
+        if (exercise == null) return Result<ExerciseDto>.Failure("Not found");
+        _mapper.Map(createExerciseDto, exercise);
+        _context.Exercises.Update(exercise);
+        await _context.SaveChangesAsync();
+        return Result<ExerciseDto>.Success(_mapper.Map<ExerciseDto>(exercise));
+    }
+
+    public async Task<Result<bool>> RemoveExercise(Guid exerciseId)
+    {
+        var exercise = await _context.Exercises.FindAsync(exerciseId);
+        if (exercise == null) return Result<bool>.Failure("Not found");
+        _context.Exercises.Remove(exercise);
+        await _context.SaveChangesAsync();
+        return Result<bool>.Success(true);
     }
 }

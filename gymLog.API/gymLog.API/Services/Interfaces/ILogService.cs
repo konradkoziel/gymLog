@@ -1,4 +1,4 @@
-﻿namespace gymLog.API.Services.interfaces
+﻿namespace gymLog.API.Services.Interfaces
 {
     public interface ILogService
     {

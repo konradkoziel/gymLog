@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using gymLog.Entity;
+using gymLog.API.Entity;
 
 #nullable disable
 
@@ -22,22 +22,26 @@ namespace gymLog.API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("gymLog.Model.Exercise", b =>
+            modelBuilder.Entity("gymLog.API.Model.Exercise", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Category")
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("varchar(500)");
+                    b.Property<decimal>("LastMaxWeight")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("varchar(100)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("WorkoutDayId")
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Reps")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("WorkoutDayId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -47,7 +51,32 @@ namespace gymLog.API.Migrations
                     b.ToTable("Exercises");
                 });
 
-            modelBuilder.Entity("gymLog.Model.User", b =>
+            modelBuilder.Entity("gymLog.API.Model.ExerciseProgress", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ExerciseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("RepsDone")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("WeightUsed")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExerciseId");
+
+                    b.ToTable("ExerciseProgress");
+                });
+
+            modelBuilder.Entity("gymLog.API.Model.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -56,42 +85,32 @@ namespace gymLog.API.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Height")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("PasswordHash")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Weight")
-                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("gymLog.Model.WorkoutDay", b =>
+            modelBuilder.Entity("gymLog.API.Model.WorkoutDay", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Day")
+                    b.Property<int>("DayOfWeek")
                         .HasColumnType("int");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("varchar(500)");
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("WorkoutPlanId")
+                    b.Property<Guid>("WorkoutPlanId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -101,23 +120,21 @@ namespace gymLog.API.Migrations
                     b.ToTable("WorkoutDays");
                 });
 
-            modelBuilder.Entity("gymLog.Model.WorkoutPlan", b =>
+            modelBuilder.Entity("gymLog.API.Model.WorkoutPlan", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("varchar(500)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.PrimitiveCollection<string>("WorkoutSelectedDays")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -126,44 +143,68 @@ namespace gymLog.API.Migrations
                     b.ToTable("WorkoutPlans");
                 });
 
-            modelBuilder.Entity("gymLog.Model.Exercise", b =>
+            modelBuilder.Entity("gymLog.API.Model.Exercise", b =>
                 {
-                    b.HasOne("gymLog.Model.WorkoutDay", "WorkoutDay")
+                    b.HasOne("gymLog.API.Model.WorkoutDay", "WorkoutDay")
                         .WithMany("Exercises")
-                        .HasForeignKey("WorkoutDayId");
+                        .HasForeignKey("WorkoutDayId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("WorkoutDay");
                 });
 
-            modelBuilder.Entity("gymLog.Model.WorkoutDay", b =>
+            modelBuilder.Entity("gymLog.API.Model.ExerciseProgress", b =>
                 {
-                    b.HasOne("gymLog.Model.WorkoutPlan", null)
-                        .WithMany("WorkoutDays")
-                        .HasForeignKey("WorkoutPlanId");
+                    b.HasOne("gymLog.API.Model.Exercise", "Exercise")
+                        .WithMany("ProgressHistory")
+                        .HasForeignKey("ExerciseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Exercise");
                 });
 
-            modelBuilder.Entity("gymLog.Model.WorkoutPlan", b =>
+            modelBuilder.Entity("gymLog.API.Model.WorkoutDay", b =>
                 {
-                    b.HasOne("gymLog.Model.User", "User")
-                        .WithMany("WorkoutPlans")
-                        .HasForeignKey("UserId");
+                    b.HasOne("gymLog.API.Model.WorkoutPlan", "WorkoutPlan")
+                        .WithMany("Days")
+                        .HasForeignKey("WorkoutPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WorkoutPlan");
+                });
+
+            modelBuilder.Entity("gymLog.API.Model.WorkoutPlan", b =>
+                {
+                    b.HasOne("gymLog.API.Model.User", "User")
+                        .WithMany("Plans")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("gymLog.Model.User", b =>
+            modelBuilder.Entity("gymLog.API.Model.Exercise", b =>
                 {
-                    b.Navigation("WorkoutPlans");
+                    b.Navigation("ProgressHistory");
                 });
 
-            modelBuilder.Entity("gymLog.Model.WorkoutDay", b =>
+            modelBuilder.Entity("gymLog.API.Model.User", b =>
+                {
+                    b.Navigation("Plans");
+                });
+
+            modelBuilder.Entity("gymLog.API.Model.WorkoutDay", b =>
                 {
                     b.Navigation("Exercises");
                 });
 
-            modelBuilder.Entity("gymLog.Model.WorkoutPlan", b =>
+            modelBuilder.Entity("gymLog.API.Model.WorkoutPlan", b =>
                 {
-                    b.Navigation("WorkoutDays");
+                    b.Navigation("Days");
                 });
 #pragma warning restore 612, 618
         }
