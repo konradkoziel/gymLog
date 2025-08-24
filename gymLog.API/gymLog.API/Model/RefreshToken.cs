@@ -1,6 +1,4 @@
-﻿using gymLog.Model;
-
-namespace gymLog.API.Model;
+﻿namespace gymLog.API.Model;
 
 public class RefreshToken {
     public Guid Id { get; set; }

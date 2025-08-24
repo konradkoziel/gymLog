@@ -43,7 +43,7 @@ public class WorkoutPlanController : ControllerBase
         return BadRequest(result.Message);
     }
 
-    [HttpPost("{workoutPlanId:guid}")]
+    [HttpPost("{userId:guid}")]
     public async Task<ActionResult<CreatePlanDto>> PostWorkoutPlan(Guid userId, CreatePlanDto workoutPlanDto)
     {
         var result = await _service.CreateWorkoutPlan(userId, workoutPlanDto);

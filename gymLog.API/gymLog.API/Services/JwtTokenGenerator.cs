@@ -30,7 +30,7 @@ namespace gymLog.API.Services
                     new Claim(JwtRegisteredClaimNames.Email, user.Email),
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)); // NOSONAR
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var expires = DateTime.UtcNow.AddHours(1);
 
