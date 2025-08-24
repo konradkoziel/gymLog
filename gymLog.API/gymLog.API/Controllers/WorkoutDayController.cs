@@ -1,10 +1,12 @@
 using gymLog.API.Model;
 using gymLog.API.Model.DTO.WorkoutDayDto;
 using gymLog.API.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace gymLog.API.Controllers;
 
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class WorkoutDayController : ControllerBase
@@ -17,7 +19,7 @@ public class WorkoutDayController : ControllerBase
     }
 
     [HttpGet("all/{workoutPlanId:guid}")]
-    public async Task<ActionResult<IEnumerable<WorkoutDay>>> GetWorkoutDays(Guid workoutPlanId)
+    public async Task<ActionResult<IEnumerable<WorkoutDayDto>>> GetWorkoutDays(Guid workoutPlanId)
     {
         var result = await _service.GetAllWorkoutDays(workoutPlanId);
         if (result.IsSuccess) return Ok(result.Data);
@@ -25,7 +27,7 @@ public class WorkoutDayController : ControllerBase
     }
 
     [HttpGet("{workoutDayId:guid}")]
-    public async Task<ActionResult<WorkoutDay>> GetWorkoutDay(Guid workoutDayId)
+    public async Task<ActionResult<WorkoutDayDto>> GetWorkoutDay(Guid workoutDayId)
     {
         var result = await _service.GetWorkoutDayById(workoutDayId);
         if (result.IsSuccess) return Ok(result.Data);

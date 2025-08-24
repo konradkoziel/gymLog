@@ -1,9 +1,11 @@
 using gymLog.API.Model;
 using gymLog.API.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace gymLog.API.Controllers;
 
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class WorkoutPlanController : ControllerBase
@@ -18,7 +20,7 @@ public class WorkoutPlanController : ControllerBase
     }
 
     [HttpGet("all/{userId:guid}")]
-    public async Task<ActionResult<IEnumerable<WorkoutPlan>>> GetWorkoutPlans(Guid userId)
+    public async Task<ActionResult<IEnumerable<PlanDto>>> GetWorkoutPlans(Guid userId)
     {
         var result = await _service.GetAllWorkoutPlans(userId);
         if (result.IsSuccess) return Ok(result.Data);
@@ -26,7 +28,7 @@ public class WorkoutPlanController : ControllerBase
     }
 
     [HttpGet("{workoutPlanId:guid}")]
-    public async Task<ActionResult<WorkoutPlan>> GetWorkoutPlan(Guid workoutPlanId)
+    public async Task<ActionResult<PlanDto>> GetWorkoutPlan(Guid workoutPlanId)
     {
         var result = await _service.GetWorkoutPlanById(workoutPlanId);
         if (result.IsSuccess) return Ok(result.Data);
@@ -42,7 +44,7 @@ public class WorkoutPlanController : ControllerBase
     }
 
     [HttpPost("{workoutPlanId:guid}")]
-    public async Task<ActionResult<WorkoutPlan>> PostWorkoutPlan(Guid userId, CreatePlanDto workoutPlanDto)
+    public async Task<ActionResult<CreatePlanDto>> PostWorkoutPlan(Guid userId, CreatePlanDto workoutPlanDto)
     {
         var result = await _service.CreateWorkoutPlan(userId, workoutPlanDto);
         if (result.IsSuccess) return Ok(result.Data);

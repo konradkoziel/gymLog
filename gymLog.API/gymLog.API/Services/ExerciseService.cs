@@ -4,6 +4,7 @@ using gymLog.API.Model;
 using gymLog.API.Model.DTO;
 using gymLog.API.Model.DTO.ExerciseDto;
 using gymLog.API.Services.Interfaces;
+using gymLog.API.Validators;
 using Microsoft.EntityFrameworkCore;
 
 namespace gymLog.API.Services;
@@ -27,20 +28,21 @@ public class ExerciseService : IExerciseService
         return Result<IEnumerable<ExerciseDto>>.Success(execricesDto);
     }
 
-    public async Task<Result<ExerciseDto>> CreateExercise(Guid workoutDayId, ExerciseDto exerciseDto)
+    public async Task<Result<ExerciseDto>> CreateExercise(CreateExerciseDto createExerciseDto)
     {
-        var exercise = _mapper.Map<Exercise>(exerciseDto);
-        exercise.WorkoutDayId = workoutDayId;
+        var validator = new ExerciseValidator();
+        validator.Validate(createExerciseDto);
+        var exercise = _mapper.Map<Exercise>(createExerciseDto);
         _context.Add((object)exercise);
         await _context.SaveChangesAsync();
         return Result<ExerciseDto>.Success(_mapper.Map<ExerciseDto>(exercise));
     }
 
-    public async Task<Result<ExerciseDto>> UpdateExercise(Guid exerciseId, ExerciseDto exerciseDto)
+    public async Task<Result<ExerciseDto>> UpdateExercise(Guid exerciseId, CreateExerciseDto createExerciseDto)
     {
         var exercise = await _context.Exercises.FindAsync(exerciseId);
         if (exercise == null) return Result<ExerciseDto>.Failure("Not found");
-        _mapper.Map(exerciseDto, exercise);
+        _mapper.Map(createExerciseDto, exercise);
         _context.Exercises.Update(exercise);
         await _context.SaveChangesAsync();
         return Result<ExerciseDto>.Success(_mapper.Map<ExerciseDto>(exercise));

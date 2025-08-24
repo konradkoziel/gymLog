@@ -13,67 +13,43 @@ namespace gymLog.API.Controllers;
 [ApiController]
 public class AuthController : ControllerBase
 {
-    private readonly IConfiguration _configuration;
-    private readonly IUserService _userService;
+    private readonly IAuthService _authService;
+    private readonly IJwtTokenGenerator _jwtTokenGenerator;
 
-    public AuthController(IUserService userService, IConfiguration configuration)
+    public AuthController(IAuthService authService, IJwtTokenGenerator jwtTokenGenerator)
     {
-        _userService = userService;
-        _configuration = configuration;
+        _authService = authService;
+        _jwtTokenGenerator = jwtTokenGenerator;
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] Login loginModel)
+    public async Task<IActionResult> Login([FromBody] LoginDto login)
     {
-        var user = await _userService.AuthenticateAsync(loginModel.Email, loginModel.PasswordHash);
-        if (user == null) return Unauthorized();
+        var loginResult = await _authService.Login(login);
+        if (loginResult.IsSuccess)
+        {
+            var token = _jwtTokenGenerator.GenerateToken(loginResult.Data);
+            return Ok(new
+            {
+                Token = token
+            });
+        }
+        return BadRequest(loginResult.Message);
 
-        var token = GenerateJwtToken(user);
-        return Ok(new { token });
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
     {
-        var user = new User
+        var registerResult = await _authService.Register(registerDto);
+        if (registerResult.IsSuccess)
         {
-            Id = Guid.NewGuid(),
-            Name = registerDto.Name,
-            Email = registerDto.Email,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
-            DateOfBirth = registerDto.DateOfBirth,
-            Weight = registerDto.Weight,
-            Height = registerDto.Height,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        var result = await _userService.CreateAsync(user);
-        if (result.IsSuccess) return CreatedAtAction(nameof(Login), new { email = result.Data!.Email }, result.Data);
-
-        return BadRequest(result);
-    }
-
-    private string GenerateJwtToken(User user)
-    {
-        var jwtSettings = _configuration.GetSection("Jwt");
-        var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]);
-
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(new[]
+            var token = _jwtTokenGenerator.GenerateToken(registerResult.Data);
+            return Ok(new
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email)
-            }),
-            Expires = DateTime.UtcNow.AddMinutes(double.Parse(jwtSettings["ExpireMinutes"])),
-            SigningCredentials =
-                new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
-            Issuer = jwtSettings["Issuer"],
-            Audience = jwtSettings["Audience"]
-        };
-
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
+                Token = token
+            });
+        }
+        return BadRequest(registerResult.Message);
     }
 }

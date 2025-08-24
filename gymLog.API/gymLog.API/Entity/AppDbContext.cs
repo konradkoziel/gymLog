@@ -26,7 +26,7 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<WorkoutPlan>()
             .HasMany(p => p.Days)
             .WithOne(d => d.WorkoutPlan)
-            .HasForeignKey(d => d.WorkoutPlan)
+            .HasForeignKey(d => d.WorkoutPlanId)
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<WorkoutDay>()

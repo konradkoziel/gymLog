@@ -1,10 +1,12 @@
 ﻿using gymLog.API.Model;
 using gymLog.API.Model.DTO.ExerciseDto;
 using gymLog.API.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace gymLog.API.Controllers;
 
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class ExerciseController : ControllerBase
@@ -17,7 +19,7 @@ public class ExerciseController : ControllerBase
     }
 
     [HttpGet("{workoutDayId:guid}")]
-    public async Task<ActionResult<IEnumerable<Exercise>>> GetExercises(Guid workoutDayId)
+    public async Task<ActionResult<IEnumerable<ExerciseDto>>> GetExercises(Guid workoutDayId)
     {
         var result = await _service.GetAllExercises(workoutDayId);
         if (result.IsSuccess) return Ok(result.Data);
@@ -25,17 +27,17 @@ public class ExerciseController : ControllerBase
     }
 
     [HttpPut("{exerciseId:guid}")]
-    public async Task<IActionResult> PutExercise(Guid exerciseId, ExerciseDto exerciseDto)
+    public async Task<IActionResult> PutExercise(Guid exerciseId, CreateExerciseDto createExerciseDto)
     {
-        var result = await _service.UpdateExercise(exerciseId, exerciseDto);
+        var result = await _service.UpdateExercise(exerciseId, createExerciseDto);
         if (result.IsSuccess) return Ok(result.Data);
         return BadRequest(result.Message);
     }
 
-    [HttpPost("{workoutDayId:guid}")]
-    public async Task<ActionResult<Exercise>> PostExercise(Guid workoutDayId, ExerciseDto exerciseDto)
+    [HttpPost]
+    public async Task<ActionResult<ExerciseDto>> PostExercise( CreateExerciseDto createExerciseDto)
     {
-        var result = await _service.CreateExercise(workoutDayId, exerciseDto);
+        var result = await _service.CreateExercise(createExerciseDto);
         if (result.IsSuccess) return Ok(result.Data);
         return BadRequest(result.Message);
     }
